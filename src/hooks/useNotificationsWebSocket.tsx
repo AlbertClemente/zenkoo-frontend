@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { showNotification } from '@mantine/notifications';
+import { IconBell } from '@tabler/icons-react';
 
-export function useNotificationsWebSocket(userId: string | undefined) {
-  const [hasUnread, setHasUnread] = useState(false);
+export function useNotificationsWebSocket(userId: string | undefined, onNewNotification?: () => void) {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -16,9 +17,16 @@ export function useNotificationsWebSocket(userId: string | undefined) {
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log('📥 Datos Webtoken: ', data)
-      if (data?.type === 'new_notification') {
-        setHasUnread(true);
+
+      if (data?.message) {
+        showNotification({
+          title: 'Notificación',
+          message: data.message,
+          color: 'teal',
+          icon: <IconBell size={16} />,
+        });
+
+        if (onNewNotification) onNewNotification(); // Por ejemplo: refreshUnreadCount()
       }
     };
 
@@ -33,9 +41,5 @@ export function useNotificationsWebSocket(userId: string | undefined) {
     return () => {
       ws.close();
     };
-  }, [userId]);
-
-  const markAllAsRead = () => setHasUnread(false);
-
-  return { hasUnread, markAllAsRead };
+  }, [userId, onNewNotification]);
 }

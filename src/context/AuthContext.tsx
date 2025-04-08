@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 import Cookies from 'js-cookie';
 import api from '@/lib/axios';
 import { showNotification } from '@mantine/notifications';
@@ -22,27 +21,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<true | string> => {
     try {
-      const response = await api.post('/api/users/login/', {
-        email,
-        password,
-      });
-      
-      // Obtenemos token y lo guardamos como cookie en navegador
+      const response = await api.post('/api/users/login/', { email, password });
       const { access, refresh } = response.data;
+
+      // Guardar tokens
       Cookies.set('accessToken', access);
       Cookies.set('refreshToken', refresh);
       setIsAuthenticated(true);
-  
-      // Obtener datos del usuario
-      const userData = await api.get('/api/users/profile/', {
-        headers: {
-          Authorization: `Bearer ${access}`,
-        },
-      });
-  
+
+      // Obtener datos de usuario usando `api` (el header ya se agrega con el token desde la cookie)
+      const userData = await api.get('/api/users/profile/');
       setUser(userData.data);
 
       showNotification({
@@ -53,26 +43,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error de login:', error.response?.data || error.message);
 
-      // Errores API HTTP
-
-      if (error.response?.status === 400) {
-        return 'Solicitud incorrecta';
-      }
-
-      if (error.response?.status === 401) {
-        return 'Credenciales incorrectas';
-      }
-
-      if (error.response?.status === 403) {
-        return 'Acceso prohibido';
-      }
-
-      if (error.response?.status === 500) {
-        return 'Error en el servidor';
-      }
+      if (error.response?.status === 400) return 'Solicitud incorrecta';
+      if (error.response?.status === 401) return 'Credenciales incorrectas';
+      if (error.response?.status === 403) return 'Acceso prohibido';
+      if (error.response?.status === 500) return 'Error en el servidor';
 
       return 'Error desconocido';
     }
@@ -96,19 +73,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const access = Cookies.get('accessToken');
     if (access) {
-      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/`, {
-        headers: {
-          Authorization: `Bearer ${access}`,
-        },
-      })
+      api
+        .get('/api/users/profile/')
         .then((res) => {
           setUser(res.data);
           setIsAuthenticated(true);
         })
         .catch(() => logout())
-        .finally(() => setLoading(false)); // loading a false cuando se finaliza la comprobación inicial del token
+        .finally(() => setLoading(false));
     } else {
-      // Si no hay token en la cookie, loading a false
       setLoading(false);
     }
   }, []);
