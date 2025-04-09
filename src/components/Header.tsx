@@ -6,14 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useNotificationsWebSocket } from '@/hooks/useNotificationsWebSocket';
 import { useUnreadNotificationsCount } from '@/hooks/useUnreadNotificationsCount';
 
-import {
-  Group,
-  Text,
-  Indicator,
-  ActionIcon,
-  Menu,
-  Divider,
-} from '@mantine/core';
+import { Group, Text, Indicator, ActionIcon, Menu, Divider, } from '@mantine/core';
 
 import { useDisclosure } from '@mantine/hooks';
 
@@ -48,6 +41,8 @@ export default function Header() {
             size={16}
             color="red"
             disabled={unreadCount === 0}
+            inline 
+            processing
           >
             <ActionIcon
               variant="subtle"
@@ -78,7 +73,7 @@ export default function Header() {
         </Group>
       </Group>
 
-      <NotificationDrawer opened={drawerOpened} onClose={close} />
+      <NotificationDrawer opened={drawerOpened} onClose={close} refreshUnreadCount={refreshUnreadCount} />
     </>
   );
 }

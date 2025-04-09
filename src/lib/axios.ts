@@ -5,6 +5,17 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
+api.interceptors.request.use(
+  config => {
+    const token = Cookies.get('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => Promise.reject(error)
+);
+
 // interceptor con Axios para renovar el access token automáticamente cuando expire usando el refresh token
 api.interceptors.response.use(
   response => response,
@@ -23,17 +34,22 @@ api.interceptors.response.use(
         const newAccessToken = res.data.access;
         Cookies.set('accessToken', newAccessToken);
 
-        // Reintentar la petición con el nuevo token
+        // Reintentar con nuevo token
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         console.error('Error al refrescar el token', refreshError);
-        // Aquí podrías hacer logout automático si lo deseas
+        
+        //Limpiamos los tokens de las cookies
+        Cookies.remove('accessToken');
+        Cookies.remove('refreshToken');
+
+        //Redirigimos al Login
+        window.location.href = '/login';
       }
     }
 
     return Promise.reject(error);
   }
 );
-
 export default api;
