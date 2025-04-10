@@ -6,18 +6,52 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/axios'; 
 import Cookies from 'js-cookie';
 
-interface Notification {
-  id: string;
-  message: string;
-  created_at: string;
-  is_read: boolean;
-}
+import type { Notification } from '@/types/notification';
 
-export default function NotificationDrawer({ opened, onClose, refreshUnreadCount, }: { opened: boolean; onClose: () => void; refreshUnreadCount: () => void; }) {
+
+export default function NotificationDrawer({ opened, onClose, refreshUnreadCount, onNewNotificationPush}: { opened: boolean; onClose: () => void; refreshUnreadCount: () => void; onNewNotificationPush?: (callback: (notification: Notification) => void) => void; }) {
   const [notificationData, setNotificationData] = useState<{
     count: number;
     results: Notification[];
   }>({ count: 0, results: [] });
+
+  useEffect(() => {
+    if (!onNewNotificationPush) return;
+  
+    const handleNewNotification = (newNotification: Notification) => {
+      console.log('📩 Notificación recibida desde WebSocket:', newNotification);
+  
+      if (!newNotification?.id) {
+        console.warn('❌ Notificación sin ID. Se ignora:', newNotification);
+        return;
+      }
+  
+      setNotificationData((prev) => {
+        if (!prev) {
+          console.warn('⚠️ Estado aún no cargado. Ignorando push de notificación.');
+          return prev;
+        }
+  
+        const alreadyExists = prev.results.some((n) => n.id === newNotification.id);
+        if (alreadyExists) {
+          console.log('🔁 Notificación ya existe. Se ignora:', newNotification.id);
+          return prev;
+        }
+  
+        const updated = {
+          ...prev,
+          count: prev.count + 1,
+          results: [newNotification, ...prev.results],
+        };
+  
+        console.log('✅ Estado actualizado con nueva notificación:', updated);
+        return updated;
+      });
+    };
+  
+    // Solo registramos el callback, sin limpiar
+    onNewNotificationPush(handleNewNotification);
+  }, [onNewNotificationPush]);
 
   //Paginación
   const [totalPages, setTotalPages] = useState(1);
@@ -153,20 +187,21 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
       {/* Listado de notificaciones */}
       <ScrollArea>
         <Stack miw={0} mih={100}>
-          {!notificationData || notificationData.results.length === 0 ? (
+          {notificationData?.results.length === 0 ? (
             <Text c="dimmed">No hay notificaciones.</Text>
           ) : (
-            notificationData?.results.map((notification) => {
-              const cardContent = (
+            notificationData.results.map((notification) => {
+              console.log('🔔 Notificación renderizada:', notification);
+              return (
                 <Transition
-                  key={notification.id}
                   mounted={!deletingIds.includes(notification.id)}
                   transition="fade"
                   duration={200}
                   timingFunction="ease"
+                  key={notification.id}
                 >
                   {(styles) => (
-                    <div style={styles}>
+                    <div key={notification.id} style={styles}>
                       <Card shadow="sm" padding="lg" radius="md" withBorder style={{ position: "relative" }}>
                         {!notification.is_read && (
                           <Indicator
@@ -177,7 +212,7 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
                             style={{ position: "absolute", top: 20, left: 42 }}
                           />
                         )}
-
+            
                         <Group justify="space-between" mt="md" mb="xs" align="flex-start">
                           <div>
                             <Text size="sm">{notification.message}</Text>
@@ -185,8 +220,7 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
                               {new Date(notification.created_at).toLocaleString()}
                             </Text>
                           </div>
-
-                          {/* Marcar como leída o borrar notificación */}
+            
                           <Group spacing="xs">
                             {!notification.is_read && (
                               <Tooltip label="Marcar como leída" refProp="rootRef">
@@ -213,8 +247,6 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
                   )}
                 </Transition>
               );
-
-              return cardContent;
             })
           )}
         </Stack>

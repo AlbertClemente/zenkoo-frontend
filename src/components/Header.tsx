@@ -1,6 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRef, useCallback } from 'react';
+
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useNotificationsWebSocket } from '@/hooks/useNotificationsWebSocket';
@@ -13,16 +16,38 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconBell, IconLogout, IconSettings } from '@tabler/icons-react';
 
 import UserButton from '@/components/UserButton';
-import NotificationDrawer from '@/components/NotificationDrawer';
+
+import NotificationDrawer from './NotificationDrawer';
+
+import type { Notification } from '@/types/notification';
+
 
 export default function Header() {
   const { logout, user } = useAuth();
   const userId = user?.id;
-  const { unreadCount, refreshUnreadCount } = useUnreadNotificationsCount();
-  const [drawerOpened, { open, close }] = useDisclosure(false);
-  
-  useNotificationsWebSocket(userId, refreshUnreadCount); // Escuchar y refrescar el contador
+  const [drawerOpened, { open, close }] = useDisclosure(false); // Drawer lateral
+  const { unreadCount, refreshUnreadCount } = useUnreadNotificationsCount(); //Contador de notificaciones
+  const listenersRef = useRef<((notification: Notification) => void)[]>([]);
 
+
+  const handleNewNotificationPush = useCallback((notification: Notification) => {
+    console.log('🧠 handleNewNotificationPush ejecutado con:', notification);
+    const event = new CustomEvent('newNotificationFromWS', { detail: notification }); 
+    window.dispatchEvent(event);
+    listenersRef.current.forEach((callback) => callback(notification));
+  }, []);
+
+  const registerPushCallback = useCallback((cb: (notification: Notification) => void) => {
+    listenersRef.current.push(cb);
+    return () => {
+      listenersRef.current = listenersRef.current.filter((fn) => fn !== cb);
+    };
+  }, []);
+
+  useNotificationsWebSocket(userId, refreshUnreadCount, handleNewNotificationPush); // Escuchar y refrescar el contador
+
+
+ 
   return (
     <>
       <Group justify="space-between" align="center" h="100%" px="md">
@@ -73,7 +98,12 @@ export default function Header() {
         </Group>
       </Group>
 
-      <NotificationDrawer opened={drawerOpened} onClose={close} refreshUnreadCount={refreshUnreadCount} />
+      <NotificationDrawer 
+        opened={drawerOpened} 
+        onClose={close} 
+        refreshUnreadCount={refreshUnreadCount} 
+        onNewNotificationPush={registerPushCallback}
+      />
     </>
   );
 }

@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   const login = async (email: string, password: string): Promise<true | string> => {
     try {
@@ -71,7 +72,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Cargar token si existe
   useEffect(() => {
+    //Protección de hidratación
+    setMounted(true); // Esperamos a montar en cliente
+
     const access = Cookies.get('accessToken');
+    
     if (access) {
       api
         .get('/api/users/profile/')
@@ -85,6 +90,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
     }
   }, []);
+
+  if (!mounted) return null; // Evita render antes del montaje
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isAuthenticated, loading }}>
