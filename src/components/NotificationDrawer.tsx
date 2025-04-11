@@ -186,7 +186,7 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
     >
       {/* Listado de notificaciones */}
       <ScrollArea>
-        <Stack miw={0} mih={100}>
+        <Stack miw={0}>
           {notificationData?.results.length === 0 ? (
             <Text c="dimmed">No hay notificaciones.</Text>
           ) : (
@@ -207,7 +207,7 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
                           <Indicator
                             label="Nueva"
                             size={16}
-                            color="teal"
+                            color="zenkooBlue"
                             processing
                             style={{ position: "absolute", top: 20, left: 42 }}
                           />
@@ -221,19 +221,19 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
                             </Text>
                           </div>
             
-                          <Group spacing="xs">
+                          <Group gap="xs">
                             {!notification.is_read && (
                               <Tooltip label="Marcar como leída" refProp="rootRef">
                                 <Switch
                                   size="xs"
-                                  color="teal"
+                                  color="zenkooBlue"
                                   onChange={() => handleMarkAsRead(notification.id)}
                                 />
                               </Tooltip>
                             )}
                             <Tooltip label="Eliminar">
                               <ActionIcon
-                                color="red"
+                                color="zenkooRed"
                                 variant="subtle"
                                 onClick={() => handleDeleteNotification(notification.id)}
                               >
@@ -270,7 +270,7 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
         <Button leftSection={<IconChecklist size={14} />} mt="md" onClick={markAllAsRead} disabled={!notificationData || notificationData.results.every(notification => notification.is_read)}>
           Todas leídas
         </Button>
-        <Button leftSection={<IconEraser size={14} />} mt="md" variant="light" color="red" onClick={deleteAll} disabled={!notificationData || notificationData.results.length === 0}>
+        <Button leftSection={<IconEraser size={14} />} mt="md" variant="light" color="zenkooRed" onClick={deleteAll} disabled={!notificationData || notificationData.results.length === 0}>
           Borrar todas 
         </Button>
       </Group>

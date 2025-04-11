@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useNotificationsWebSocket } from '@/hooks/useNotificationsWebSocket';
 import { useUnreadNotificationsCount } from '@/hooks/useUnreadNotificationsCount';
 
-import { Group, Text, Indicator, ActionIcon, Menu, Divider, } from '@mantine/core';
+import { Group, Text, Indicator, ActionIcon, Menu, Divider, Tooltip, useMantineColorScheme, Switch } from '@mantine/core';
 
 import { useDisclosure } from '@mantine/hooks';
 
@@ -18,6 +18,7 @@ import { IconBell, IconLogout, IconSettings } from '@tabler/icons-react';
 import UserButton from '@/components/UserButton';
 
 import NotificationDrawer from './NotificationDrawer';
+import ThemeToggle from './ThemeToggle';
 
 import type { Notification } from '@/types/notification';
 
@@ -59,12 +60,13 @@ export default function Header() {
           <Link href="/expenses">Gastos</Link>
         </Group>
 
-        {/* Derecha: campanita + menú usuario */}
+        {/* Derecha: switch + campanita + menú usuario */}
         <Group>
+          {/* Campanita notificaciones */}
           <Indicator
             label={unreadCount > 0 ? unreadCount : null}
             size={16}
-            color="red"
+            color="zenkooRed"
             disabled={unreadCount === 0}
             inline 
             processing
@@ -78,7 +80,11 @@ export default function Header() {
               <IconBell size={22} />
             </ActionIcon>
           </Indicator>
+          
+          {/* Switch tema */}
+          <ThemeToggle />
 
+          {/* Menú desplegable usuario */}
           <Menu withArrow>
             <Menu.Target>
               <UserButton
@@ -90,7 +96,7 @@ export default function Header() {
             <Menu.Dropdown>
               <Menu.Item leftSection={<IconSettings size={16} />}>Configuración</Menu.Item>
               <Divider />
-              <Menu.Item leftSection={<IconLogout size={16} />} onClick={logout} color="red">
+              <Menu.Item leftSection={<IconLogout size={16} />} onClick={logout} color="zenkooRed">
                 Cerrar sesión
               </Menu.Item>
             </Menu.Dropdown>

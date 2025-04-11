@@ -27,7 +27,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
       <Transition mounted={loading} transition="fade" duration={300} timingFunction="ease">
         {(styles) => (
           <Center h="100vh" style={styles}>
-            <Loader size="lg" color="teal" />
+            <Loader size="lg" color="zenkooBlue" />
           </Center>
         )}
       </Transition>
@@ -39,7 +39,6 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
       padding="md"
       header={{
         height: 60,
-        padding: 'md',
       }}
     >
       <AppShell.Header>

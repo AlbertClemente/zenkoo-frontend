@@ -22,6 +22,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 * {
@@ -33,6 +34,10 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.theme-toggle-animating {
+  transform: rotate(180deg);
 }
 
 @media (prefers-color-scheme: dark) {

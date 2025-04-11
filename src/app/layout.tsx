@@ -1,11 +1,11 @@
+// layout.tsx
 import './globals.css';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 
-import { ColorSchemeScript, MantineProvider } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
 import type { Metadata } from 'next';
+import ThemeProvider from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
   title: 'Zenkoo - The Smart Saving App',
@@ -14,13 +14,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" data-mantine-color-scheme="auto">
-      <head></head>
+    <html lang="es">
       <body>
-        <MantineProvider defaultColorScheme="auto">
-          <Notifications />
-          {children}
-        </MantineProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
