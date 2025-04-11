@@ -39,7 +39,7 @@ export default function ThemeToggle() {
       >
         <span style={{ display: 'grid', placeItems: 'center' }}>
           {isDark ? (
-            <IconSun
+            <IconMoonStars
               style={{
                 width: rem(20),
                 height: rem(20),
@@ -47,7 +47,7 @@ export default function ThemeToggle() {
               }}
             />
           ) : (
-            <IconMoonStars
+            <IconSun
               style={{
                 width: rem(20),
                 height: rem(20),

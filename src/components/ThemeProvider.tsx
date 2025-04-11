@@ -3,6 +3,12 @@
 import { useEffect, useState } from 'react';
 import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es'; // Importamos el locale para España, override a US
+import { DatesProvider } from '@mantine/dates';
+import { ModalsProvider } from '@mantine/modals';
+
+dayjs.locale('es'); //Aplica el idioma español para fechas
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>('light');
@@ -97,11 +103,16 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
           fontFamily: 'Inter, sans-serif',
           defaultRadius: 'md',
         }}>
-          <Notifications position="top-right" zIndex={2077} />
-          {/* Pasamos toggle y colorScheme por contexto si se necesita */}
-          <ThemeContext.Provider value={{ colorScheme, toggleColorScheme }}>
-            {children}
-          </ThemeContext.Provider>
+          {/* Lunes como primer día, formato europeo */}
+          <DatesProvider settings={{ locale: 'es', firstDayOfWeek: 1, weekendDays: [0, 6] }}>
+            <ModalsProvider>
+              <Notifications position="top-right" zIndex={2077} />
+              {/* Pasamos toggle y colorScheme por contexto si se necesita */}
+              <ThemeContext.Provider value={{ colorScheme, toggleColorScheme }}>
+                {children}
+              </ThemeContext.Provider>
+            </ModalsProvider>
+          </DatesProvider>
       </MantineProvider>
     </>
   );
