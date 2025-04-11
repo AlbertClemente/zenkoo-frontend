@@ -45,7 +45,7 @@ api.interceptors.response.use(
         Cookies.remove('refreshToken');
 
         //Redirigimos al Login
-        window.location.href = '/login';
+        window.location.href = '/';
       }
     }
 

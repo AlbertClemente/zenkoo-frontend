@@ -97,7 +97,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
           fontFamily: 'Inter, sans-serif',
           defaultRadius: 'md',
         }}>
-          <Notifications />
+          <Notifications position="top-right" zIndex={2077} />
           {/* Pasamos toggle y colorScheme por contexto si se necesita */}
           <ThemeContext.Provider value={{ colorScheme, toggleColorScheme }}>
             {children}

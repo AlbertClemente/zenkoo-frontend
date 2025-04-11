@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  TextInput,
-  PasswordInput,
-  Paper,
-  Title,
-  Container,
-  Button,
-  Stack,
-} from '@mantine/core';
+import {TextInput, PasswordInput, Paper, Title, Container, Button, Stack,} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';

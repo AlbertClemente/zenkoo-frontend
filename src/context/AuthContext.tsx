@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       showNotification({
         title: 'Bienvenido',
         message: 'Inicio de sesión exitoso',
-        color: 'teal',
+        color: 'zenkoo',
         icon: <IconCheck size={16} />,
       });
 
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     showNotification({
       title: 'Sesión cerrada',
       message: 'Has cerrado sesión correctamente',
-      color: 'blue',
+      color: 'zenkooBlue',
       icon: <IconCheck size={16} />,
     });
   };

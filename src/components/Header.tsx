@@ -81,9 +81,6 @@ export default function Header() {
             </ActionIcon>
           </Indicator>
           
-          {/* Switch tema */}
-          <ThemeToggle />
-
           {/* Menú desplegable usuario */}
           <Menu withArrow>
             <Menu.Target>
@@ -101,6 +98,9 @@ export default function Header() {
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
+
+          {/* Switch tema */}
+          <ThemeToggle />
         </Group>
       </Group>
 

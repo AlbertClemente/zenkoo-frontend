@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
-import { IconChevronRight } from '@tabler/icons-react';
+import { IconChevronCompactDown } from '@tabler/icons-react';
 import { Group, Avatar, Text, UnstyledButton } from '@mantine/core';
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
@@ -35,7 +35,7 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
           </Text>
         </div>
 
-        {icon || <IconChevronRight size={16} />}
+        {icon || <IconChevronCompactDown size={16} />}
       </Group>
     </UnstyledButton>
   )
