@@ -6,17 +6,18 @@ import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { createIncome, updateIncome } from '@/lib/incomes';
-import type { Income } from '@/lib/incomes';
 
-interface IncomeDrawerProps {
+import { createExpense, updateExpense } from '@/lib/expenses';
+import type { Expense } from '@/lib/expenses';
+
+interface ExpenseDrawerProps {
   opened: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  incomeToEdit?: Income | null; //para cuando vayamos a editar un income desde el drawer
+  expenseToEdit?: Expense | null; //para cuando vayamos a editar un expense desde el drawer
 }
 
-export default function IncomeDrawer({ opened, onClose, onSuccess, incomeToEdit }: IncomeDrawerProps) {
+export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdit }: ExpenseDrawerProps) {
   const [loading, setLoading] = useState(false);
 
   const form = useForm({
@@ -24,46 +25,50 @@ export default function IncomeDrawer({ opened, onClose, onSuccess, incomeToEdit 
       amount: 0,
       date: new Date(),
       type: '',
+      category: '',
     },
   });
 
   useEffect(() => {
-    if (incomeToEdit) {
+    if (expenseToEdit) {
       form.setValues({
-        amount: parseFloat(incomeToEdit.amount.toString()),
-        date: new Date(incomeToEdit.date),
-        type: incomeToEdit.type,
+        amount: parseFloat(expenseToEdit.amount.toString()),
+        date: new Date(expenseToEdit.date),
+        type: expenseToEdit.type,
+        category: expenseToEdit.category,
       });
     } else {
       form.reset();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [incomeToEdit]);
-  
+  // eslint-disable-next-line react-hooks/exhaustive-deps  
+  }, [expenseToEdit]);
+
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true);
     try {
-      if (incomeToEdit) {
-        await updateIncome(incomeToEdit.id, {
+      if (expenseToEdit) {
+        await updateExpense(expenseToEdit.id, {
           amount: values.amount,
           date: values.date.toISOString(),
           type: values.type,
+          category: values.category
         });
         showNotification({
-          title: 'Ingreso actualizado',
+          title: 'Gasto actualizado',
           message: 'Los cambios se han guardado correctamente',
           color: 'zenkoo',
           icon: <IconCheck size={16} />,
         });
       } else {
-        await createIncome({
+        await createExpense({
           amount: values.amount,
           date: values.date.toISOString(),
           type: values.type,
+          category: values.category
         });
         showNotification({
-          title: 'Ingreso creado',
-          message: 'El ingreso se ha registrado correctamente',
+          title: 'Gasto creado',
+          message: 'El gasto se ha registrado correctamente',
           color: 'zenkoo',
           icon: <IconCheck size={16} />,
         });
@@ -75,7 +80,7 @@ export default function IncomeDrawer({ opened, onClose, onSuccess, incomeToEdit 
     } catch (error) {
       showNotification({
         title: 'Error',
-        message: 'No se pudo guardar el ingreso',
+        message: 'No se pudo guardar el gasto',
         color: 'zenkooRed',
         icon: <IconX size={16} />,
       });
@@ -88,7 +93,7 @@ export default function IncomeDrawer({ opened, onClose, onSuccess, incomeToEdit 
     <Drawer
       opened={opened}
       onClose={onClose}
-      title="Nuevo ingreso"
+      title="Nuevo gasto"
       padding="xl"
       size="sm"
       position="right"
@@ -114,9 +119,15 @@ export default function IncomeDrawer({ opened, onClose, onSuccess, incomeToEdit 
             required
           />
           <TextInput
-            label="Categoría"
+            label="Tipo"
             placeholder="Ej: Sueldo, Extra, etc."
             {...form.getInputProps('type')}
+            required
+          />
+          <TextInput
+            label="Categoría"
+            placeholder="Ej: Sueldo, Extra, etc."
+            {...form.getInputProps('category')}
             required
           />
           <Button type="submit" loading={loading} fullWidth>

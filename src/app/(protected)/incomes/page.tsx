@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button, Container, Group, Table, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
-import { getIncomes, Income } from '@/lib/incomes';
+import { getIncomes, Income, deleteIncome } from '@/lib/incomes';
 import dayjs from 'dayjs';
 import IncomeDrawer from '@/components/IncomeDrawer';
 
@@ -12,7 +12,6 @@ import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconPencil, IconTrash, IconCheck, IconX } from '@tabler/icons-react';
 
 import { modals } from '@mantine/modals';
-import { deleteIncome } from '@/lib/incomes';
 
 export default function IncomesPage() {
   const [incomes, setIncomes] = useState<Income[]>([]);
@@ -48,16 +47,18 @@ export default function IncomesPage() {
       centered: true,
       children: 'Esta acción no se puede deshacer. ¿Estás seguro?',
       labels: { confirm: 'Eliminar', cancel: 'Cancelar' },
-      confirmProps: { color: 'red' },
+      confirmProps: { color: 'zenkooRed' },
       onConfirm: async () => {
         try {
           await deleteIncome(id);
+
           showNotification({
             title: 'Ingreso eliminado',
             message: 'El ingreso se eliminó correctamente',
             color: 'zenkoo',
             icon: <IconCheck size={16} />,
           });
+
           setLoading(true);
           getIncomes().then(setIncomes).finally(() => setLoading(false));
         } catch (error) {
@@ -124,6 +125,7 @@ export default function IncomesPage() {
           )}
         </Table.Tbody>
       </Table>
+      
       <IncomeDrawer
         opened={drawerOpened}
         onClose={() => setDrawerOpened(false)}
