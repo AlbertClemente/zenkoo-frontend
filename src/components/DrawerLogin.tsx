@@ -6,13 +6,14 @@ import {
   PasswordInput,
   Button,
   Stack,
-  Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { LoginUser } from '@/types/user';
+
 import { showNotification } from '@mantine/notifications';
-import { IconX } from '@tabler/icons-react';
+import { IconX, IconCheck } from '@tabler/icons-react';
 
 interface DrawerLoginProps {
   opened: boolean;
@@ -30,17 +31,61 @@ export default function DrawerLogin({ opened, onClose }: DrawerLoginProps) {
     },
   });
 
-  const handleSubmit = async (values: typeof form.values) => {
-    const result = await login(values.email, values.password);
+  // Validación segura del objeto recibido
+  function isLoginUser(obj: any): obj is LoginUser {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      typeof obj.first_name === 'string' &&
+      typeof obj.email === 'string' &&
+      typeof obj.is_staff === 'boolean' &&
+      typeof obj.is_superuser === 'boolean'
+    );
+  }
 
-    if (result === true) {
-      onClose();
-      router.push('/dashboard');
-    } else {
+  const handleSubmit = async (values: typeof form.values) => {
+    try {
+      const result = await login(values.email, values.password);
+
+      if (isLoginUser(result)) {
+        const user = result;
+
+        const name =
+          user.first_name?.trim() || user.email?.trim() || 'usuario';
+
+        showNotification({
+          title: 'Bienvenido',
+          message: `Hola, ${name}!`,
+          color: 'zenkoo',
+          icon: <IconCheck size={16} />,
+        });
+
+        onClose();
+
+        if (user.is_superuser) {
+          router.push('/admin-panel');
+        } else if (user.is_staff) {
+          router.push('/staff-panel');
+        } else {
+          router.push('/dashboard');
+        }
+
+      } else {
+        showNotification({
+          title: 'Error',
+          message: typeof result === 'string'
+            ? result
+            : 'Ha ocurrido un error inesperado al iniciar sesión.',
+          color: 'zenkooRed',
+          icon: <IconX size={16} />,
+        });
+      }
+    } catch (err) {
+      console.error('Error inesperado en login:', err);
       showNotification({
         title: 'Error',
-        message: result,
-        color: 'red',
+        message: 'Algo ha ido mal al iniciar sesión.',
+        color: 'zenkooRed',
         icon: <IconX size={16} />,
       });
     }

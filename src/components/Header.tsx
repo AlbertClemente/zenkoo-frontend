@@ -24,7 +24,7 @@ import type { Notification } from '@/types/notification';
 
 
 export default function Header() {
-  const { logout, user } = useAuth();
+  const { logout, user, isAdmin } = useAuth();
   const userId = user?.id;
   const [drawerOpened, { open, close }] = useDisclosure(false); // Drawer lateral
   const { unreadCount, refreshUnreadCount } = useUnreadNotificationsCount(); //Contador de notificaciones
@@ -53,12 +53,22 @@ export default function Header() {
     <>
       <Group justify="space-between" align="center" h="100%" px="md">
         {/* Izquierda: logo y navegación */}
-        <Group gap="md">
-          <Text fw={700}>Zenkoo</Text>
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/incomes">Ingresos</Link>
-          <Link href="/expenses">Gastos</Link>
-        </Group>
+        {!isAdmin && (
+          <Group gap="md">
+            <Text fw={700}>Zenkoo</Text>
+            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/incomes">Ingresos</Link>
+            <Link href="/expenses">Gastos</Link>
+          </Group>
+        )}
+        {isAdmin && (
+          <Group gap="md">
+            <Text fw={700}>Zenkoo</Text>
+            <Link href="/admin-panel">
+              Panel Admin
+            </Link>
+          </Group>
+        )}
 
         {/* Derecha: switch + campanita + menú usuario */}
         <Group>

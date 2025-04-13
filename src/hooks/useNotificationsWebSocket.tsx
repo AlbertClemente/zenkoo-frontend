@@ -38,7 +38,7 @@ export function useNotificationsWebSocket(
         showNotification({
           title: 'Notificación',
           message: data.message,
-          color: data.type?.toLowerCase() === 'cripto' ? 'purple' : 'teal',
+          color: data.type?.toLowerCase() === 'cripto' ? 'zenkooViolet' : 'zenkoo',
           icon: data.type?.toLowerCase() === 'cripto'
             ? <IconCurrencyBitcoin size={16} />
             : <IconBell size={16} />,

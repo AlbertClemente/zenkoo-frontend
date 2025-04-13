@@ -3,15 +3,20 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from '@/lib/axios';
+import { LoginUser } from '@/types/user';
+
 import { showNotification } from '@mantine/notifications';
 import { IconCheck } from '@tabler/icons-react';
 
 interface AuthContextType {
-  user: any;
-  login: (email: string, password: string) => Promise<true | string>;
+  user: LoginUser | null;
+  login: (email: string, password: string) => Promise<LoginUser | string>;
   logout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
+  isAdmin: boolean;
+  isStaff: boolean;
+  isRegularUser: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,7 +27,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  const login = async (email: string, password: string): Promise<true | string> => {
+  const isAdmin = user?.is_superuser === true
+  const isStaff = user?.is_staff === true && !isAdmin
+  const isRegularUser = !user?.is_staff && !user?.is_superuser
+
+  type LoginResult = { is_staff: boolean; is_superuser: boolean } | string;
+
+  const login = async (email: string, password: string): Promise<LoginResult> => {
     try {
       const response = await api.post('/api/users/login/', { email, password });
       const { access, refresh } = response.data;
@@ -36,14 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userData = await api.get('/api/users/profile/');
       setUser(userData.data);
 
-      showNotification({
-        title: 'Bienvenido',
-        message: 'Inicio de sesión exitoso',
-        color: 'zenkoo',
-        icon: <IconCheck size={16} />,
-      });
-
-      return true;
+      return userData.data as LoginUser;
     } catch (error: any) {
       console.error('Error de login:', error.response?.data || error.message);
 
@@ -94,7 +98,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   if (!mounted) return null; // Evita render antes del montaje
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      isAuthenticated, 
+      loading, 
+      isAdmin,
+      isStaff,
+      isRegularUser,
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mantine/charts": "^7.17.4",
     "@mantine/core": "^7.17.4",
     "@mantine/dates": "^7.17.4",
     "@mantine/form": "^7.17.3",
@@ -21,7 +22,8 @@
     "js-cookie": "^3.0.5",
     "next": "15.2.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "recharts": "^2.15.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

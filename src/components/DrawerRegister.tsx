@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  Drawer,
-  TextInput,
-  PasswordInput,
-  Button,
-  Stack,
-  Title,
-  Group,
-} from '@mantine/core';
+import { Drawer, TextInput, PasswordInput, Button, Stack, Title, Group, } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
@@ -50,7 +42,7 @@ export default function DrawerRegister({ opened, onClose }: DrawerRegisterProps)
       showNotification({
         title: 'Registro exitoso',
         message: 'Ya puedes iniciar sesión',
-        color: 'green',
+        color: 'zenkoo',
         icon: <IconCheck size={16} />,
       });
       onClose();
@@ -58,7 +50,7 @@ export default function DrawerRegister({ opened, onClose }: DrawerRegisterProps)
       showNotification({
         title: 'Error',
         message: error.response?.data?.detail || 'Error al registrar',
-        color: 'red',
+        color: 'zenkooRed',
         icon: <IconX size={16} />,
       });
     } finally {
