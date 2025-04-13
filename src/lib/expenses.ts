@@ -14,7 +14,7 @@ export interface ExpenseCreate {
   amount: number;
   date: string; // ISO string
   type: string;
-  category: string;
+  category?: string;
 }
 
 export async function getExpenses(): Promise<Expense[]> {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button, Container, Group, Table, Title } from '@mantine/core';
+import { Button, Container, Group, Table, Title, Badge, Text } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
 import { getExpenses, Expense, deleteExpense } from '@/lib/expenses';
@@ -18,6 +18,13 @@ export default function ExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [drawerOpened, setDrawerOpened] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
+  const categoryColors: Record<string, string> = {
+    'Supervivencia': 'zenkoo',
+    'Ocio y vicio': 'zenkooYellow',
+    'Cultura': 'zenkooViolet',
+    'Extras': 'zenkooBlue',
+    'Desconocido': 'gray',
+  };
 
   useEffect(() => {
     async function fetchExpenses() {
@@ -97,28 +104,37 @@ export default function ExpensesPage() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {expenses.map((expense) => (
-            <Table.Tr key={expense.id}>
-              <Table.Td>{dayjs(expense.date).format('DD/MM/YYYY')}</Table.Td>
-              <Table.Td>{expense.type}</Table.Td>
-              <Table.Td>{expense.category}</Table.Td>
-              <Table.Td>{parseFloat(expense.amount.toString()).toFixed(2)} €</Table.Td>
-              <Table.Td>
-                <Group gap={4}>
-                  <Tooltip label="Editar">
-                    <ActionIcon variant="subtle" color="zenkooBlue" onClick={() => handleEdit(expense)}>
-                      <IconPencil size={18} />
-                    </ActionIcon>
-                  </Tooltip>
-                  <Tooltip label="Eliminar">
-                    <ActionIcon variant="subtle" color="zenkooRed" onClick={() => handleDelete(expense.id)}>
-                      <IconTrash size={18} />
-                    </ActionIcon>
-                  </Tooltip>
-                </Group>
-              </Table.Td>
-            </Table.Tr>
-          ))}
+          {expenses.map((expense) => {
+            const categoryName = expense.category ?? 'Desconocido';
+            const badgeColor = categoryColors[categoryName] || 'grape';
+
+            return (
+              <Table.Tr key={expense.id}>
+                <Table.Td>{dayjs(expense.date).format('DD/MM/YYYY')}</Table.Td>
+                <Table.Td>{expense.type}</Table.Td>
+                <Table.Td>
+                  <Badge variant="light" color={badgeColor}>
+                    {categoryName}
+                  </Badge>  
+                </Table.Td>
+                <Table.Td>{parseFloat(expense.amount.toString()).toFixed(2)} €</Table.Td>
+                <Table.Td>
+                  <Group gap={4}>
+                    <Tooltip label="Editar">
+                      <ActionIcon variant="subtle" color="zenkooBlue" onClick={() => handleEdit(expense)}>
+                        <IconPencil size={18} />
+                      </ActionIcon>
+                    </Tooltip>
+                    <Tooltip label="Eliminar">
+                      <ActionIcon variant="subtle" color="zenkooRed" onClick={() => handleDelete(expense.id)}>
+                        <IconTrash size={18} />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
+                </Table.Td>
+              </Table.Tr>
+            );
+          })}
           {expenses.length === 0 && !loading && (
             <Table.Tr>
               <Table.Td colSpan={5} style={{ textAlign: 'center', color: '#888' }}>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Drawer, TextInput, Button, Stack, NumberInput,} from '@mantine/core';
+import { Drawer, TextInput, Button, Stack, NumberInput, Group, Badge, Text, Select } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
@@ -8,7 +8,13 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 
 import { createExpense, updateExpense } from '@/lib/expenses';
+import { getCategories } from '@/lib/categories';
+
 import type { Expense } from '@/lib/expenses';
+import type { Category } from '@/lib/categories';
+
+import { usePredictCategory } from '@/hooks/usePredictCategory';
+
 
 interface ExpenseDrawerProps {
   opened: boolean;
@@ -19,6 +25,27 @@ interface ExpenseDrawerProps {
 
 export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdit }: ExpenseDrawerProps) {
   const [loading, setLoading] = useState(false);
+
+  // IA
+  const { suggestedCategory, predict, resetSuggestion } = usePredictCategory();
+
+  const [categories, setCategories] = useState<{ label: string; value: string }[]>([]);
+
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data.map((cat: Category) => ({
+          label: cat.name,
+          value: cat.name
+        })));
+      } catch (error) {
+        console.error('Error al cargar categorías:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const form = useForm({
     initialValues: {
@@ -60,12 +87,22 @@ export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdi
           icon: <IconCheck size={16} />,
         });
       } else {
-        await createExpense({
+        //Fallback: si el campo Categoría está vacío y hay sugerencia generada por IA, rellenamos la categoría con la sugerencia:
+        if (values.category.trim() === '' && suggestedCategory) {
+          values.category = suggestedCategory;
+        }
+
+        //Evitar que se envíe gasto sin categoríaz
+        const payload = {
           amount: values.amount,
           date: values.date.toISOString(),
           type: values.type,
-          category: values.category
-        });
+          // Solo incluimos categoría si no está vacía
+          ...(values.category.trim() !== '' && { category: values.category }),
+        };
+
+        await createExpense(payload);
+
         showNotification({
           title: 'Gasto creado',
           message: 'El gasto se ha registrado correctamente',
@@ -76,6 +113,7 @@ export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdi
   
       form.reset();
       onClose();
+      resetSuggestion();
       onSuccess();
     } catch (error) {
       showNotification({
@@ -88,6 +126,14 @@ export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdi
       setLoading(false);
     }
   };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!opened) {
+      form.reset();
+      resetSuggestion(); // Limpieza al cerrar también
+    }
+  }, [opened]);
 
   return (
     <Drawer
@@ -119,19 +165,42 @@ export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdi
             required
           />
           <TextInput
-            label="Tipo"
+            label="Tipo de gasto"
             placeholder="Ej: Sueldo, Extra, etc."
             {...form.getInputProps('type')}
+            onBlur={(e) => {
+              const value = e.target.value.trim();
+          
+              // Validación simple para evitar predicciones basura
+              const isValid = value.length >= 3 && /[a-zA-Z]/.test(value);
+          
+              if (isValid) predict(value);
+            }}
             required
           />
-          <TextInput
+        {suggestedCategory && (
+          <Group gap="xs" mt="xs">
+            <Text size="sm">💡 Sugerencia:</Text>
+            <Badge
+              variant="light"
+              color="zenkoo"
+              style={{ cursor: 'pointer' }}
+              onClick={() => form.setFieldValue('category', suggestedCategory)}
+            >
+              {suggestedCategory}
+            </Badge>
+          </Group>
+        )}
+          <Select
             label="Categoría"
-            placeholder="Ej: Sueldo, Extra, etc."
+            placeholder="Selecciona o escribe"
+            searchable
+            data={categories}
             {...form.getInputProps('category')}
-            required
+            
           />
           <Button type="submit" loading={loading} fullWidth>
-            Guardar ingreso
+            Guardar gasto
           </Button>
         </Stack>
       </form>
