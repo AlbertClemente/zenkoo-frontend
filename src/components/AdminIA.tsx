@@ -125,7 +125,9 @@ export default function AdminIA() {
                 <Text>📅 Último entrenamiento: {new Date(modelInfo.lastTrainedAt).toLocaleString()}</Text>
                 <Text>📦 Muestras usadas: {modelInfo.sampleCount}</Text>
                 <Text>🏷️ Categorías: {modelInfo.categories.join(', ')}</Text>
-                <Text>📈 Precisión (accuracy): {modelInfo.accuracy !== null ? `${modelInfo.accuracy}%` : 'N/D'}</Text>
+                <Text>
+                  📈 Precisión (accuracy): {modelInfo.accuracy !== null ? `${modelInfo.accuracy.toFixed(2)}%` : 'N/D'}
+                </Text>
                 <Text size="xs" c="dimmed">Versión del modelo: {modelInfo.modelVersion}</Text>
               </Stack>
 
