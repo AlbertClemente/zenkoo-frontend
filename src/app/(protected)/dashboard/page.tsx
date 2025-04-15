@@ -19,6 +19,10 @@ import Link from 'next/link';
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 
+import useCalendarTransactions from '@/hooks/useCalendarTransactions';
+import UserCalendarSection from '@/components/UserCalendarSection';
+
+
 export default function DashboardPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -27,6 +31,8 @@ export default function DashboardPage() {
   const [savingGoals, setSavingGoals] = useState<SavingGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [goalToEdit, setGoalToEdit] = useState<SavingGoal | null>(null);
+
+  const { transactions, loading: loadingCalendar } = useCalendarTransactions();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -141,6 +147,16 @@ export default function DashboardPage() {
             </Button>
           </Group>
         </>
+      )}
+
+      <Title order={3} mt="xl" mb="sm">
+        Resumen del mes
+      </Title>
+
+      {loadingCalendar ? (
+        <Loader color="zenkoo" />
+      ) : (
+        <UserCalendarSection data={transactions} />
       )}
 
       <DrawerSavingGoal
