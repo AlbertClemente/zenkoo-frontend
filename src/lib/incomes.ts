@@ -15,9 +15,24 @@ export interface IncomeCreate {
   type: string;
 }
 
-export async function getIncomes(): Promise<Income[]> {
-  const response = await api.get('/api/incomes/');
-  return response.data.results; 
+export interface IncomeResponse {
+  results: Income[];
+  count: number;
+}
+
+export async function getIncomes(
+  page = 1,
+  startDate?: string,
+  endDate?: string,
+  pageSize = 5
+): Promise<{ results: Income[]; count: number }> {
+  const params: any = { page, page_size: pageSize };
+
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+
+  const response = await api.get('/api/incomes/', { params });
+  return response.data;
 }
 
 export async function createIncome(data: IncomeCreate): Promise<Income> {

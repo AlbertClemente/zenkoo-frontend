@@ -59,6 +59,8 @@ export default function Header() {
             <Link href="/dashboard">Dashboard</Link>
             <Link href="/incomes">Ingresos</Link>
             <Link href="/expenses">Gastos</Link>
+            <Link href="/saving-goals">Metas</Link>
+            <Link href="/reflections">Reflexiones</Link>
           </Group>
         )}
         {isAdmin && (

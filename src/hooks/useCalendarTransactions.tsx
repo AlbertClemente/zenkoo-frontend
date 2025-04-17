@@ -32,6 +32,7 @@ export default function useCalendarTransactions() {
           amount: Number(i.amount),
           type: i.type,
           kind: 'income',
+          category: i.category || null,
         }));
         
         const expenseTxs: Transaction[] = expenseRes.data.results.map((e) => ({
@@ -40,6 +41,7 @@ export default function useCalendarTransactions() {
           amount: Number(e.amount),
           type: e.type,
           kind: 'expense',
+          category: e.category || null,
         }));
         
         const goalTxs: Transaction[] = goalRes.data.results
@@ -49,10 +51,10 @@ export default function useCalendarTransactions() {
           date: g.deadline as string,
           amount: 0,
           type: 'Meta de ahorro',
-          kind: 'goal', // puedes definir un tipo especial para tratarlos diferente
+          kind: 'goal',
           isSavingGoalDay: true,
-          description: g.title, // opcional si quieres mostrar el título
-          category: null, // o alguna categoría si aplicara
+          description: g.title,
+          category: null,
         }));
 
         setTransactions([...incomeTxs, ...expenseTxs, ...goalTxs]);

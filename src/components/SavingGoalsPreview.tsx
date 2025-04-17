@@ -1,6 +1,6 @@
 'use client';
 
-import { Stack, Text } from '@mantine/core';
+import { Stack, Text, Card } from '@mantine/core';
 import { SavingGoal } from '@/lib/savinggoals';
 import { SavingGoalCard } from './SavingGoalCard';
 
@@ -10,13 +10,19 @@ interface SavingGoalsPreviewProps {
   onDelete: (id: string) => void;
 }
 
-export function SavingGoalsPreview({ savingGoals, onEdit, onDelete }: SavingGoalsPreviewProps) {
+export function SavingGoalsPreview({ savingGoals = [], onEdit, onDelete }: SavingGoalsPreviewProps) {
   const activeGoals = savingGoals
     .filter((goal) => goal.status === 'active')
-    .slice(0, 3);
+    .slice(0, 5);
 
   if (activeGoals.length === 0) {
-    return <Text c="dimmed">Aún no tienes metas activas 🐷</Text>;
+    return (
+      <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Text size="md" c="dimmed">
+          No tienes metas activas 🐷
+        </Text>
+      </Card>
+    );
   }
 
   return (

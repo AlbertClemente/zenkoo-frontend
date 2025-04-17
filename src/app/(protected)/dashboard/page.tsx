@@ -47,8 +47,8 @@ export default function DashboardPage() {
   const fetchSavingGoals = async () => {
     setLoading(true);
     try {
-      const data = await getSavingGoals();
-      setSavingGoals(data);
+      const data = await getSavingGoals(1, 'active');
+      setSavingGoals(data.results); 
     } finally {
       setLoading(false);
     }

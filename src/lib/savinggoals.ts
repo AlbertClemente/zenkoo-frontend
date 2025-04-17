@@ -11,6 +11,13 @@ export interface SavingGoal {
   updated_at: string;
 }
 
+export interface SavingGoalResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: SavingGoal[];
+}
+
 export interface SavingGoalCreate {
   title: string;
   target_amount: number;
@@ -19,9 +26,14 @@ export interface SavingGoalCreate {
   status: string;
 }
 
-export async function getSavingGoals(): Promise<SavingGoal[]> {
-  const response = await api.get('/api/saving-goals/');
-  return response.data.results; 
+export async function getSavingGoals(page: number = 1, status?: string): Promise<SavingGoalResponse> {
+  const response = await api.get('/api/saving-goals/', {
+    params: {
+      page,
+      ...(status && status !== 'all' ? { status } : {}),
+    },
+  });
+  return response.data;
 }
 
 export async function createSavingGoal(data: SavingGoalCreate): Promise<SavingGoal> {

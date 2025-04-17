@@ -22,25 +22,36 @@ import { IconCheck, IconPigMoney, IconX } from '@tabler/icons-react';
 import { SavingGoalCard } from './SavingGoalCard';
 import SavingGoalDrawer from './SavingGoalDrawer';
 
-const ITEMS_PER_PAGE = 6;
+const PAGE_SIZE = 5;
 
 export default function SavingGoalsList() {
   const [savingGoals, setSavingGoals] = useState<SavingGoal[]>([]);
+  const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [savingGoalToEdit, setSavingGoalToEdit] = useState<SavingGoal | null>(null);
   const [drawerOpened, setDrawerOpened] = useState(false);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<'all' | 'active' | 'paused' | 'completed'>('all');
 
+  const totalPages = Math.ceil(count / PAGE_SIZE);
+
   useEffect(() => {
     fetchGoals();
-  }, []);
+  }, [page, filter]);
 
   const fetchGoals = async () => {
     setLoading(true);
     try {
-      const data = await getSavingGoals();
-      setSavingGoals(data);
+      const data = await getSavingGoals(page, filter);
+
+      const newTotalPages = Math.ceil(data.count / PAGE_SIZE);
+      if (page > newTotalPages && newTotalPages > 0) {
+        setPage(1);
+        return;
+      }
+
+      setSavingGoals(data.results);
+      setCount(data.count);
     } finally {
       setLoading(false);
     }
@@ -85,17 +96,6 @@ export default function SavingGoalsList() {
     });
   };
 
-  const filteredGoals =
-    filter === 'all'
-      ? savingGoals
-      : savingGoals.filter((goal) => goal.status === filter);
-
-  const totalPages = Math.ceil(filteredGoals.length / ITEMS_PER_PAGE);
-  const paginatedGoals = filteredGoals.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
-
   useEffect(() => {
     setPage(1); // reset page when filter changes
   }, [filter]);
@@ -128,14 +128,14 @@ export default function SavingGoalsList() {
         </Button>
       </Group>
 
-      {filteredGoals.length === 0 ? (
+      {savingGoals.length === 0 ? (
         <Text c="dimmed" ta="center">
           No hay metas en este estado 🐷
         </Text>
       ) : (
         <>
           <Stack>
-            {paginatedGoals.map((goal) => (
+            {savingGoals.map((goal) => (
               <SavingGoalCard
                 key={goal.id}
                 goal={goal}

@@ -17,9 +17,26 @@ export interface ExpenseCreate {
   category?: string;
 }
 
-export async function getExpenses(): Promise<Expense[]> {
-  const response = await api.get('/api/expenses/');
-  return response.data.results; 
+export interface ExpenseResponse {
+  results: Expense[];
+  count: number;
+}
+
+export async function getExpenses(
+  page = 1,
+  startDate?: string,
+  endDate?: string,
+  pageSize = 5,
+  category?: string
+): Promise<{ results: Expense[]; count: number }> {
+  const params: any = { page, page_size: pageSize };
+
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+  if (category) params.category = category;
+
+  const response = await api.get('/api/expenses/', { params });
+  return response.data;
 }
 
 export async function createExpense(data: ExpenseCreate): Promise<Expense> {
