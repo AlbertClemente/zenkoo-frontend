@@ -72,15 +72,10 @@ export default function UserCalendarSection({ data }: { data: Transaction[] }) {
   const renderDay = (date: Date) => {
     const key = dayjs(date).format('YYYY-MM-DD');
     const transactions = transactionsByDate[key] || [];
-
     const isToday = dayjs(date).isSame(dayjs(), 'day');
     const isSelected = selectedDate && dayjs(date).isSame(selectedDate, 'day');
-    
-
     const isStartOfMonth = Array.from(customStartOfMonthDates).includes(key);
     const isEndOfMonth = Array.from(customEndOfMonthDates).includes(key);
-
-
     const hasGoal = transactions.some((t) => t.isSavingGoalDay);
 
     console.log({
@@ -88,8 +83,6 @@ export default function UserCalendarSection({ data }: { data: Transaction[] }) {
       isStartOfMonth,
       isEndOfMonth
     });
-
-
 
     const dot = (color: string, idx: number, shape: 'round' | 'square' = 'round') => (
       <Box
