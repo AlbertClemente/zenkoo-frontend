@@ -1,4 +1,3 @@
-// layout.tsx
 import './globals.css';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';

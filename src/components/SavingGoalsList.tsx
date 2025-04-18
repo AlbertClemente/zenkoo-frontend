@@ -9,6 +9,7 @@ import {
   SegmentedControl,
   Group,
   Button,
+  Card,
 } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import {
@@ -121,7 +122,7 @@ export default function SavingGoalsList() {
 
         <Button
           leftSection={<IconPigMoney size={16} />}
-          color="zenkooBlue"
+          color="zenkoo"
           onClick={handleNew}
         >
           Nueva meta
@@ -129,9 +130,11 @@ export default function SavingGoalsList() {
       </Group>
 
       {savingGoals.length === 0 ? (
-        <Text c="dimmed" ta="center">
-          No hay metas en este estado 🐷
-        </Text>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Text size="md" c="dimmed">
+            No hay metas en este estado 🐷
+          </Text>
+        </Card>
       ) : (
         <>
           <Stack>

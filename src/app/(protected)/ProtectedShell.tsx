@@ -1,50 +1,41 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
 import {
   AppShell,
   Container,
   Center,
   Loader,
-  Transition
 } from '@mantine/core';
-import { useEffect } from 'react';
 import Header from '@/components/Header';
 
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+export default function ProtectedShell({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/');
-    }
-  }, [isAuthenticated, loading]);
-
-  if (loading || (!isAuthenticated && typeof window !== 'undefined')) {
+  // 1. Mientras carga, mostramos el loader.
+  if (loading) {
     return (
-      <Transition mounted={loading} transition="fade" duration={300} timingFunction="ease">
-        {(styles) => (
-          <Center h="100vh" style={styles}>
-            <Loader size="lg" color="zenkooBlue" />
-          </Center>
-        )}
-      </Transition>
+      <Center h="100vh">
+        <Loader size="lg" color="zenkooBlue" />
+      </Center>
     );
   }
 
+  // 2. Si no está autenticado (por algún motivo), devolvemos null.
+  // El middleware ya debería haber redirigido.
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  // 3. Render normal
   return (
     <AppShell
       padding="md"
-      header={{
-        height: 60,
-      }}
+      header={{ height: 60 }}
     >
       <AppShell.Header>
         <Header />
       </AppShell.Header>
-
       <AppShell.Main>
         <Container>{children}</Container>
       </AppShell.Main>

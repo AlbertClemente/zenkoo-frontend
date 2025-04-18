@@ -46,8 +46,6 @@ export default function Header() {
   }, []);
 
   useNotificationsWebSocket(userId, refreshUnreadCount, handleNewNotificationPush); // Escuchar y refrescar el contador
-
-
  
   return (
     <>

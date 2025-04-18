@@ -6,7 +6,7 @@ import { showNotification } from '@mantine/notifications';
 import { getExpenses, Expense, deleteExpense } from '@/lib/expenses';
 import dayjs from 'dayjs';
 import ExpenseDrawer from '@/components/ExpenseDrawer';
-import { IconPencil, IconTrash, IconCheck, IconX } from '@tabler/icons-react';
+import { IconPencil, IconTrash, IconCheck, IconX, IconPlus } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
 import { DatePickerInput } from '@mantine/dates';
 
@@ -95,11 +95,14 @@ export default function ExpensesPage() {
     <Container size="lg" py="xl">
       <Group justify="space-between" mb="md">
         <Title order={2}>Gastos</Title>
-        <Button onClick={() => {
-          setExpenseToEdit(null);
-          setDrawerOpened(true);
-        }}>
-          + Nuevo gasto
+        <Button
+          onClick={() => {
+            setExpenseToEdit(null);
+            setDrawerOpened(true);
+          }}
+          leftSection={<IconPlus size={16} />}
+        >
+          Nuevo gasto
         </Button>
       </Group>
 

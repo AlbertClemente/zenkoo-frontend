@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from '@/lib/axios';
@@ -22,28 +23,25 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const router = useRouter(); 
+
+  const [user, setUser] = useState<LoginUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
 
-  const isAdmin = user?.is_superuser === true
-  const isStaff = user?.is_staff === true && !isAdmin
-  const isRegularUser = !user?.is_staff && !user?.is_superuser
+  const isAdmin = user?.is_superuser === true;
+  const isStaff = user?.is_staff === true && !isAdmin;
+  const isRegularUser = !user?.is_staff && !user?.is_superuser;
 
-  type LoginResult = { is_staff: boolean; is_superuser: boolean } | string;
-
-  const login = async (email: string, password: string): Promise<LoginResult> => {
+  const login = async (email: string, password: string): Promise<LoginUser | string> => {
     try {
       const response = await api.post('/api/users/login/', { email, password });
       const { access, refresh } = response.data;
 
-      // Guardar tokens
       Cookies.set('accessToken', access);
       Cookies.set('refreshToken', refresh);
       setIsAuthenticated(true);
 
-      // Obtener datos de usuario usando `api` (el header ya se agrega con el token desde la cookie)
       const userData = await api.get('/api/users/profile/');
       setUser(userData.data);
 
@@ -65,6 +63,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     Cookies.remove('refreshToken');
     setUser(null);
     setIsAuthenticated(false);
+    setLoading(false);
+
+    Promise.resolve().then(() => router.push('/'));
 
     showNotification({
       title: 'Sesión cerrada',
@@ -74,13 +75,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  // Cargar token si existe
   useEffect(() => {
-    //Protección de hidratación
-    setMounted(true); // Esperamos a montar en cliente
-
     const access = Cookies.get('accessToken');
-    
     if (access) {
       api
         .get('/api/users/profile/')
@@ -88,14 +84,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(res.data);
           setIsAuthenticated(true);
         })
-        .catch(() => logout())
+        .catch(() => {
+          Cookies.remove('accessToken');
+          Cookies.remove('refreshToken');
+          setUser(null);
+          setIsAuthenticated(false);
+        })
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
   }, []);
-
-  if (!mounted) return null; // Evita render antes del montaje
 
   return (
     <AuthContext.Provider value={{ 

@@ -8,13 +8,20 @@ export function useNotificationsWebSocket(
   onNewNotification?: () => void,
   onNewNotificationPush?: (notification: Notification) => void
 ) {
+
+
   const wsRef = useRef<WebSocket | null>(null);
   const manuallyClosed = useRef(false);
   const retryTimeout = useRef<NodeJS.Timeout | null>(null);
   const hasConnectedOnce = useRef(false); // 🆕 evita reconectar por doble render
 
   useEffect(() => {
-    if (!userId || wsRef.current || hasConnectedOnce.current) return;
+    if (!userId) {
+      console.log('⛔ WebSocket no iniciado: userId undefined');
+      return;
+    }
+    
+    if (wsRef.current || hasConnectedOnce.current) return;
 
     hasConnectedOnce.current = true; // evita que vuelva a entrar
 

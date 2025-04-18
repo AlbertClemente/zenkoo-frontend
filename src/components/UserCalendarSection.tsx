@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import { useMemo, useState } from 'react';
 import { Transaction } from '@/types/transactions';
+import CalendarCaption from './CalendarCaption';
 
 dayjs.locale('es');
 
@@ -171,37 +172,20 @@ export default function UserCalendarSection({ data }: { data: Transaction[] }) {
   };
 
   return (
-    <Box display="flex" gap="xl" mt="md" style={{ flexWrap: 'wrap' }}>
+    <Box display="flex" mt="md" style={{ flexWrap: 'wrap', gap: 'xl', }} pos="relative">
       {/* Calendario */}
       <Box w={{ base: '100%', md: '40%', sm: '50%' }}>
-        <DatePicker
-          value={selectedDate}
-          onChange={setSelectedDate}
-          renderDay={renderDay}
-          size="md"
-        />
-        <Stack gap={6} mt="md" mb={'md'}>
-          <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Box w={10} h={10} bg="zenkoo" style={{ borderRadius: '50%' }} />
-            <Text size="xs">Ingreso</Text>
-          </Box>
-          <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Box w={10} h={10} bg="zenkooRed" style={{ borderRadius: '50%' }} />
-            <Text size="xs">Gasto</Text>
-          </Box>
-          <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Box w={10} h={10} bg="gold" style={{ borderRadius: rem(2) }} />
-            <Text size="xs">Meta activa</Text>
-          </Box>
-          <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Box w={10} h={10} bg="zenkooBlue" style={{ borderRadius: '50%' }} />
-            <Text size="xs">Inicio de mes</Text>
-          </Box>
-          <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Box w={10} h={10} bg="zenkooViolet" style={{ borderRadius: '50%' }} />
-            <Text size="xs">Fin de mes</Text>
-          </Box>
-        </Stack>
+        <Box pos="relative" style={{ zIndex: 0 }}>
+          <DatePicker
+            value={selectedDate}
+            onChange={setSelectedDate}
+            renderDay={renderDay}
+            size="md"
+          />
+        </Box>
+        <Group justify="flex-start" mt="xs" mb="md">
+          <CalendarCaption />
+        </Group>
       </Box>
 
       {/* Transacciones del día */}

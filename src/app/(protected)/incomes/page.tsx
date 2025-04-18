@@ -6,7 +6,7 @@ import { showNotification } from '@mantine/notifications';
 import { getIncomes, Income, deleteIncome } from '@/lib/incomes';
 import dayjs from 'dayjs';
 import IncomeDrawer from '@/components/IncomeDrawer';
-import { IconPencil, IconTrash, IconCheck, IconX } from '@tabler/icons-react';
+import { IconPencil, IconTrash, IconCheck, IconX, IconPlus } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
 import { DatePickerInput } from '@mantine/dates';
 
@@ -91,11 +91,14 @@ export default function IncomesPage() {
     <Container size="lg" py="xl">
       <Group justify="space-between" mb="md">
         <Title order={2}>Ingresos</Title>
-        <Button onClick={() => {
+        <Button 
+          onClick={() => {
           setIncomeToEdit(null);
           setDrawerOpened(true);
-        }}>
-          + Nuevo ingreso
+          }}
+          leftSection={<IconPlus size={16} />}
+        >
+          Nuevo ingreso
         </Button>
       </Group>
 

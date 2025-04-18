@@ -1,38 +1,42 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import {
-  Container,
-  Title,
-  Text,
-  Button,
-  Group,
-  Loader,
-} from '@mantine/core';
-import { IconPigMoney, IconArrowRight, IconCheck, IconX } from '@tabler/icons-react';
-import DrawerSavingGoal from '@/components/SavingGoalDrawer';
-import { SavingGoalsPreview } from '@/components/SavingGoalsPreview';
-import { SavingGoal, getSavingGoals, deleteSavingGoal } from '@/lib/savinggoals';
+import { Container, Title, Text, Button, Group, Loader, Divider} from '@mantine/core';
+import { IconPigMoney, IconArrowRight, IconCheck, IconX, IconEdit, IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 
-import useCalendarTransactions from '@/hooks/useCalendarTransactions';
-import UserCalendarSection from '@/components/UserCalendarSection';
+import DrawerSavingGoal from '@/components/SavingGoalDrawer';
+import { SavingGoalsPreview } from '@/components/SavingGoalsPreview';
+import { SavingGoal, deleteSavingGoal } from '@/lib/savinggoals';
 
+import UserCalendarSection from '@/components/UserCalendarSection';
+import MonthlyPlanCard from '@/components/MonthlyPlanCard';
+import MonthlyPlanDrawer from '@/components/MonthlyPlanDrawer';
+
+//Hooks
+import useMonthlyPlan from '@/hooks/useMonthlyPlan';
+import { useSavingGoals } from '@/hooks/useSavingGoals';
+import useCalendarTransactions from '@/hooks/useCalendarTransactions';
 
 export default function DashboardPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
 
-  const [drawerOpened, setDrawerOpened] = useState(false);
-  const [savingGoals, setSavingGoals] = useState<SavingGoal[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, loading: loadingMonthlyPlan, refetch: refetchMonthlyPlan } = useMonthlyPlan();
+  const [monthlyPlanDrawerOpened, setMonthlyPlanDrawerOpened] = useState(false);
+
+  const { savingGoals, loading: loadingSavingGoals, refetch: refetchSavingGoals } = useSavingGoals();
+  const [savingGoalDrawerOpened, setSavingGoalDrawerOpened] = useState(false);
   const [goalToEdit, setGoalToEdit] = useState<SavingGoal | null>(null);
 
-  const { transactions, loading: loadingCalendar } = useCalendarTransactions();
+  const { transactions, loading: loadingCalendar, refetch: refetchCalendar } = useCalendarTransactions();
+
+  
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -40,38 +44,24 @@ export default function DashboardPage() {
     }
   }, [isAuthenticated, router]);
 
-  useEffect(() => {
-    fetchSavingGoals();
-  }, []);
-
-  const fetchSavingGoals = async () => {
-    setLoading(true);
-    try {
-      const data = await getSavingGoals(1, 'active');
-      setSavingGoals(data.results); 
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleNewGoal = () => {
     setGoalToEdit(null);
-    setDrawerOpened(true);
+    setSavingGoalDrawerOpened(true);
   };
 
   const handleEditGoal = (goal: SavingGoal) => {
     setGoalToEdit(goal);
-    setDrawerOpened(true);
+    setSavingGoalDrawerOpened(true);
   };
 
-  const handleDrawerClose = () => {
-    setDrawerOpened(false);
+  const handleSavingGoalDrawerClose = () => {
+    setSavingGoalDrawerOpened(false);
     setGoalToEdit(null);
   };
 
-  const handleDrawerSuccess = () => {
-    fetchSavingGoals();
-    handleDrawerClose();
+  const handleSavingGoalDrawerSuccess = () => {
+    refetchSavingGoals();
+    handleSavingGoalDrawerClose();
   };
 
   const handleDeleteGoal = (id: string) => {
@@ -90,7 +80,7 @@ export default function DashboardPage() {
             color: 'zenkoo',
             icon: <IconCheck size={16} />,
           });
-          fetchSavingGoals();
+          refetchSavingGoals();
         } catch (err) {
           showNotification({
             title: 'Error',
@@ -109,23 +99,40 @@ export default function DashboardPage() {
     <Container>
       <Group justify="space-between" mb="md">
         <div>
-          <Title order={2}>Hola, {user.first_name || user.email} 👋</Title>
+          <Title order={2}>Hola, {user?.first_name || 'Usuario'} 👋</Title>
           <Text mt="md">Bienvenido a tu panel de control Zenkoo.</Text>
         </div>
+      </Group>
+
+      <MonthlyPlanCard />
+
+      <Group justify="flex-end" mt="xs">
         <Button
-          leftSection={<IconPigMoney size={16} />}
-          onClick={handleNewGoal}
-          color="zenkooBlue"
+          leftSection={<IconEdit size={16} />}
+          onClick={() => setMonthlyPlanDrawerOpened(true)}
+          variant="zenkoo"
         >
-          Nueva meta de ahorro
+          Editar plan
         </Button>
       </Group>
 
       <Title order={3} mt="xl" mb="sm">
-        Tus metas activas
+        Resumen de movimientos 
       </Title>
 
-      {loading ? (
+      {loadingCalendar ? (
+        <Loader color="zenkoo" />
+      ) : (
+        <UserCalendarSection data={transactions} />
+      )}
+
+      <Divider my="xl" />
+
+      <Title order={3} mt="xl" mb="sm">
+        Tus metas de ahorro activas
+      </Title>
+
+      {loadingSavingGoals ? (
         <Loader color="zenkoo" />
       ) : (
         <>
@@ -135,35 +142,43 @@ export default function DashboardPage() {
             onDelete={handleDeleteGoal}
           />
 
-          <Group justify="flex-end" mt="xs">
+          <Group justify="flex-end" mt="xs" mb="md">
             <Button
               component={Link}
               href="/saving-goals"
-              variant="subtle"
-              color="zenkooBlue"
+              variant="light"
+              color="zenkoo"
+              leftSection={<IconPigMoney size={16} />}
               rightSection={<IconArrowRight size={16} />}
             >
               Ver todas las metas
+            </Button>
+
+            <Button
+              leftSection={<IconPlus size={16} />}
+              onClick={handleNewGoal}
+              color="zenkoo"
+            >
+              Nueva meta de ahorro
             </Button>
           </Group>
         </>
       )}
 
-      <Title order={3} mt="xl" mb="sm">
-        Resumen del mes
-      </Title>
-
-      {loadingCalendar ? (
-        <Loader color="zenkoo" />
-      ) : (
-        <UserCalendarSection data={transactions} />
-      )}
-
       <DrawerSavingGoal
-        opened={drawerOpened}
-        onClose={handleDrawerClose}
-        onSuccess={handleDrawerSuccess}
+        opened={savingGoalDrawerOpened}
+        onClose={handleSavingGoalDrawerClose}
+        onSuccess={handleSavingGoalDrawerSuccess}
         savingGoalToEdit={goalToEdit}
+      />
+
+      <MonthlyPlanDrawer
+        opened={monthlyPlanDrawerOpened}
+        onClose={() => setMonthlyPlanDrawerOpened(false)}
+        onSuccess={() => {
+          setMonthlyPlanDrawerOpened(false);
+          refetchMonthlyPlan();
+        }}
       />
     </Container>
   );

@@ -10,7 +10,7 @@ export function useSavingGoals() {
     try {
       setLoading(true);
       const data = await getSavingGoals();
-      setSavingGoals(data);
+      setSavingGoals(data.results);
     } catch (err) {
       console.error(err);
       setError('Error al cargar las metas de ahorro');
