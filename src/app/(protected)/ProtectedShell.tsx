@@ -8,6 +8,7 @@ import {
   Loader,
 } from '@mantine/core';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export default function ProtectedShell({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
@@ -36,9 +37,12 @@ export default function ProtectedShell({ children }: { children: React.ReactNode
       <AppShell.Header>
         <Header />
       </AppShell.Header>
-      <AppShell.Main>
+      <AppShell.Main pt="md" pb={{ base: 100, sm: 80 }}>
         <Container>{children}</Container>
       </AppShell.Main>
+      <AppShell.Footer>
+        <Footer />
+      </AppShell.Footer>
     </AppShell>
   );
 }

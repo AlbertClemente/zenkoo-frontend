@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Button, Container, Title, Text, Group } from '@mantine/core';
 import DrawerLogin from '@/components/DrawerLogin';
 import DrawerRegister from '@/components/DrawerRegister';
+import Footer from '@/components/Footer';
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -33,9 +34,6 @@ export default function Home() {
         <DrawerRegister opened={registerOpened} onClose={() => setRegisterOpened(false)} />
       </Container>
       </main>
-      <footer className={styles.footer}>
-        
-      </footer>
     </div>
   );
 }

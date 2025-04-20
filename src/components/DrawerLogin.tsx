@@ -44,6 +44,8 @@ export default function DrawerLogin({ opened, onClose }: DrawerLoginProps) {
   }
 
   const handleSubmit = async (values: typeof form.values) => {
+    console.log("Formulario enviado", values);
+    
     try {
       const result = await login(values.email, values.password);
 
@@ -78,6 +80,7 @@ export default function DrawerLogin({ opened, onClose }: DrawerLoginProps) {
             : 'Ha ocurrido un error inesperado al iniciar sesión.',
           color: 'zenkooRed',
           icon: <IconX size={16} />,
+          autoClose: 5000,
         });
       }
     } catch (err) {
@@ -100,7 +103,12 @@ export default function DrawerLogin({ opened, onClose }: DrawerLoginProps) {
       size="sm"
       position="right"
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // Previene la recarga de la página
+          form.onSubmit(handleSubmit)(); // Llama a la función handleSubmit
+        }}
+      >
         <Stack>
           <TextInput
             label="Correo electrónico"

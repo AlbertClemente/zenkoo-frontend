@@ -38,7 +38,7 @@ export default function IncomeDrawer({
     initialValues: {
       amount: 0,
       date: new Date(),
-      type: '',
+      type: 'Sueldo', // Establecer "Sueldo" como valor por defecto
     },
   });
 
@@ -47,25 +47,44 @@ export default function IncomeDrawer({
       form.setValues({
         amount: parseFloat(incomeToEdit.amount.toString()),
         date: new Date(incomeToEdit.date),
-        type: incomeToEdit.type,
+        type: incomeToEdit.type || 'Sueldo',  // Asegurarnos de que se establezca un valor válido
       });
       setCustomTypeVisible(!predefinedOptions.includes(incomeToEdit.type));
     } else {
       form.reset();
       setCustomTypeVisible(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [incomeToEdit]);
-
+  
+  const handleTypeChange = (value: string | null) => {
+    if (!value) return;
+  
+    // Si el usuario selecciona "Otros", mostramos el campo personalizado
+    if (value === 'Otros') {
+      form.setFieldValue('type', ''); // Limpiamos el campo de tipo
+      setCustomTypeVisible(true); // Hacemos visible el campo de tipo personalizado
+    } else {
+      form.setFieldValue('type', value); // Asignamos el valor del tipo seleccionado
+      setCustomTypeVisible(false); // Ocultamos el campo de tipo personalizado
+    }
+  };
+  
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true);
     try {
+      // Asegurarse de que el valor de 'type' esté correctamente asignado
       const typeValue = customTypeVisible
-        ? form.values.type.trim()
-        : form.values.type;
-
-      if (!typeValue) throw new Error('El tipo no puede estar vacío');
-
+        ? form.values.type.trim()  // Si 'Otros' está visible, usa el valor personalizado
+        : form.values.type;  // Si no, usamos el valor predefinido
+  
+      console.log("Tipo seleccionado:", typeValue); // Verificar el valor de tipo
+  
+      // Validación de tipo
+      if (!typeValue || typeValue.trim() === '') {
+        throw new Error('El tipo no puede estar vacío');
+      }
+  
+      // Creación o actualización del ingreso
       if (incomeToEdit) {
         await updateIncome(incomeToEdit.id, {
           amount: values.amount,
@@ -91,34 +110,23 @@ export default function IncomeDrawer({
           icon: <IconCheck size={16} />,
         });
       }
-
+  
+      // Resetear el formulario y cerrar el drawer
       form.reset();
       onClose();
       onSuccess();
     } catch (error) {
       showNotification({
         title: 'Error',
-        message: 'No se pudo guardar el ingreso',
+        message: error.message || 'No se pudo guardar el ingreso',
         color: 'zenkooRed',
         icon: <IconX size={16} />,
       });
+      console.log(error);
     } finally {
       setLoading(false);
     }
   };
-
-  const handleTypeChange = (value: string | null) => {
-    if (!value) return;
-
-    if (value === 'Otros') {
-      form.setFieldValue('type', '');
-      setCustomTypeVisible(true);
-    } else {
-      form.setFieldValue('type', value);
-      setCustomTypeVisible(false);
-    }
-  };
-
   return (
     <Drawer
       opened={opened}
@@ -152,13 +160,11 @@ export default function IncomeDrawer({
             label="Tipo de ingreso"
             placeholder="Selecciona o escribe"
             data={predefinedOptions}
-            value={
-              customTypeVisible
-                ? 'Otros'
-                : predefinedOptions.includes(form.values.type)
-                ? form.values.type
-                : 'Otros'
-            }
+            value={customTypeVisible
+              ? 'Otros'
+              : predefinedOptions.includes(form.values.type)
+              ? form.values.type
+              : 'Sueldo'}
             onChange={handleTypeChange}
             required
           />

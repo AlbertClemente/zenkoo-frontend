@@ -3,9 +3,9 @@
 import { useAuth } from '@/context/AuthContext';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Container, Title, Text, Button, Group, Loader, Divider} from '@mantine/core';
-import { IconPigMoney, IconArrowRight, IconCheck, IconX, IconEdit, IconPlus } from '@tabler/icons-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Container, Title, Text, Button, Group, Loader, Divider, Blockquote, Transition, Box} from '@mantine/core';
+import { IconPigMoney, IconArrowRight, IconCheck, IconX, IconEdit, IconPlus, IconTipJar } from '@tabler/icons-react';
 import Link from 'next/link';
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
@@ -36,9 +36,9 @@ export default function DashboardPage() {
 
   const { transactions, loading: loadingCalendar, refetch: refetchCalendar } = useCalendarTransactions();
 
-  
+  const [reloadKey, setReloadKey] = useState(0);
 
-  useEffect(() => {
+    useEffect(() => {
     if (!isAuthenticated) {
       router.push('/');
     }
@@ -93,6 +93,25 @@ export default function DashboardPage() {
     });
   };
 
+  const motivationalPhrases = [
+    'Cada euro cuenta. ¡No subestimes el poder del ahorro!',
+    'El mejor momento para empezar a ahorrar fue ayer. El segundo mejor momento es hoy.',
+    'Ahorrar no es renunciar, es priorizar.',
+    'Pequeños hábitos crean grandes resultados.',
+    'Controlar tus finanzas es controlar tu libertad.',
+    'Hoy te cuesta, mañana te lo agradeces.',
+    'El ahorro es la base de tus sueños.',
+    'No se trata de cuánto ganas, sino de cuánto conservas.',
+    'Tus decisiones de hoy definen tu tranquilidad de mañana.',
+    'La constancia vence al impulso. ¡Sigue así!'
+  ];
+
+  const randomPhrase = useMemo(() => {
+    const index = Math.floor(Math.random() * motivationalPhrases.length);
+    return motivationalPhrases[index];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!isAuthenticated) return null;
 
   return (
@@ -104,7 +123,23 @@ export default function DashboardPage() {
         </div>
       </Group>
 
-      <MonthlyPlanCard />
+      <Transition mounted={!!randomPhrase} transition="fade" duration={400} timingFunction="ease-out">
+
+        {(styles) => (
+          <Blockquote
+            style={styles}
+            color="zenkooBlue"
+            cite="– Zenkoo Team"
+            icon={<IconTipJar size={24} />}
+            mt="xl"
+            mb="xl"
+          >
+            {randomPhrase}
+          </Blockquote>
+        )}
+      </Transition>
+
+      <MonthlyPlanCard reloadKey={reloadKey} />
 
       <Group justify="flex-end" mt="xs">
         <Button
@@ -112,7 +147,7 @@ export default function DashboardPage() {
           onClick={() => setMonthlyPlanDrawerOpened(true)}
           variant="zenkoo"
         >
-          Editar plan
+          Actualizar resumen mensual
         </Button>
       </Group>
 
@@ -135,14 +170,14 @@ export default function DashboardPage() {
       {loadingSavingGoals ? (
         <Loader color="zenkoo" />
       ) : (
-        <>
+        <Box mb={{ base: 120, sm: 'xl' }}>
           <SavingGoalsPreview
             savingGoals={savingGoals}
             onEdit={handleEditGoal}
             onDelete={handleDeleteGoal}
           />
 
-          <Group justify="flex-end" mt="xs" mb="md">
+          <Group justify="flex-end" mt="xs" mb="xl">
             <Button
               component={Link}
               href="/saving-goals"
@@ -162,7 +197,7 @@ export default function DashboardPage() {
               Nueva meta de ahorro
             </Button>
           </Group>
-        </>
+        </Box>
       )}
 
       <DrawerSavingGoal
@@ -178,6 +213,7 @@ export default function DashboardPage() {
         onSuccess={() => {
           setMonthlyPlanDrawerOpened(false);
           refetchMonthlyPlan();
+          setReloadKey((prev) => prev + 1);
         }}
       />
     </Container>
