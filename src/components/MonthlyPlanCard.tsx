@@ -14,9 +14,9 @@ import {
   Tooltip
 } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import { IconArrowUpRight, IconArrowDownRight } from '@tabler/icons-react';
 import api from '@/lib/axios';
 import dayjs from 'dayjs';
+import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 
 type Reflection = {
   id: string;
@@ -139,9 +139,9 @@ export default function MonthlyPlanCard({ reloadKey }: Props) {
                 {Number(data.real_savings).toFixed(2)} €
               </Text>
               {data.real_savings >= 0 ? (
-                <IconArrowUpRight size={16} />
+                <ArrowUpRight size={16} />
               ) : (
-                <IconArrowDownRight size={16} />
+                <ArrowDownRight size={16} />
               )}
             </Group>
           </Group>

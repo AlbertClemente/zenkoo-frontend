@@ -6,6 +6,7 @@ import {
   PasswordInput,
   Button,
   Stack,
+  Group,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useAuth } from '@/context/AuthContext';
@@ -14,6 +15,8 @@ import { LoginUser } from '@/types/user';
 
 import { showNotification } from '@mantine/notifications';
 import { IconX, IconCheck } from '@tabler/icons-react';
+import { LogIn } from 'lucide-react';
+import { useState } from 'react';
 
 interface DrawerLoginProps {
   opened: boolean;
@@ -21,6 +24,7 @@ interface DrawerLoginProps {
 }
 
 export default function DrawerLogin({ opened, onClose }: DrawerLoginProps) {
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
@@ -44,7 +48,7 @@ export default function DrawerLogin({ opened, onClose }: DrawerLoginProps) {
   }
 
   const handleSubmit = async (values: typeof form.values) => {
-    console.log("Formulario enviado", values);
+    setLoading(true);
     
     try {
       const result = await login(values.email, values.password);
@@ -91,6 +95,8 @@ export default function DrawerLogin({ opened, onClose }: DrawerLoginProps) {
         color: 'zenkooRed',
         icon: <IconX size={16} />,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -122,9 +128,11 @@ export default function DrawerLogin({ opened, onClose }: DrawerLoginProps) {
             {...form.getInputProps('password')}
             required
           />
-          <Button type="submit" mt="md" fullWidth>
-            Iniciar sesión
-          </Button>
+          <Group justify="flex-end" mt="md">
+            <Button leftSection={<LogIn size={16} />} type="submit" loading={loading}>
+              Iniciar sesión
+            </Button>
+          </Group>
         </Stack>
       </form>
     </Drawer>

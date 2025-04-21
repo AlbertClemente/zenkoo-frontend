@@ -22,7 +22,7 @@ export default function AppFooter() {
           </Group>
 
           <Text size="xs" c="dimmed">
-            Hecho con 💙 por Albert Clemente Subirón
+            Hecho con 💚 por Albert Clemente Subirón 🤩✌🏻
           </Text>
         </Group>
       </Container>

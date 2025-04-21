@@ -16,6 +16,7 @@ import { IconCheck, IconX, IconAlertCircle } from '@tabler/icons-react'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { useMantineTheme } from '@mantine/core'
 import api from '@/lib/axios'
+import { Download, FileDown, FileJson, RefreshCcw } from 'lucide-react'
 
 export default function AdminIA() {
   const [modelInfo, setModelInfo] = useState<any>(null)
@@ -132,17 +133,17 @@ export default function AdminIA() {
               </Stack>
 
               <Group>
-                <Button onClick={handleRetrain} loading={retraining} disabled={retraining}>
+                <Button onClick={handleRetrain} loading={retraining} disabled={retraining} leftSection={<RefreshCcw size={16} />} >
                   Reentrenar modelo
                 </Button>
                 <a href={`${process.env.NEXT_PUBLIC_API_URL}/static/ml/model.pkl`} download>
-                  <Button variant="light">
+                  <Button variant="light" leftSection={<FileDown size={16} />}>
                     Descargar modelo
                   </Button>
                 </a>
                 <a href={`${process.env.NEXT_PUBLIC_API_URL}/static/ml/model_info.json`} download>
-                  <Button variant="light">
-                    Descargar JSON file
+                  <Button variant="light" leftSection={<FileJson size={16} />}>
+                    Descargar JSON
                   </Button>
                 </a>
               </Group>

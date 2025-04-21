@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Container, Title, Text, Button, Group, Loader, Divider, Blockquote, Transition, Box} from '@mantine/core';
-import { IconPigMoney, IconArrowRight, IconCheck, IconX, IconEdit, IconPlus, IconTipJar } from '@tabler/icons-react';
+import { IconCheck, IconX, IconTipJar } from '@tabler/icons-react';
 import Link from 'next/link';
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
@@ -22,6 +22,7 @@ import MonthlyPlanDrawer from '@/components/MonthlyPlanDrawer';
 import useMonthlyPlan from '@/hooks/useMonthlyPlan';
 import { useSavingGoals } from '@/hooks/useSavingGoals';
 import useCalendarTransactions from '@/hooks/useCalendarTransactions';
+import { MoveRight, Pencil, PiggyBank, Plus } from 'lucide-react';
 
 export default function DashboardPage() {
   const { user, isAuthenticated } = useAuth();
@@ -116,7 +117,7 @@ export default function DashboardPage() {
 
   return (
     <Container>
-      <Group justify="space-between" mb="md">
+      <Group justify="space-between" mt="xl" mb="md">
         <div>
           <Title order={2}>Hola, {user?.first_name || 'Usuario'} 👋</Title>
           <Text mt="md">Bienvenido a tu panel de control Zenkoo.</Text>
@@ -139,11 +140,13 @@ export default function DashboardPage() {
         )}
       </Transition>
 
+      <Box mt={60}></Box>
+
       <MonthlyPlanCard reloadKey={reloadKey} />
 
       <Group justify="flex-end" mt="xs">
         <Button
-          leftSection={<IconEdit size={16} />}
+          leftSection={<Pencil size={16} />}
           onClick={() => setMonthlyPlanDrawerOpened(true)}
           variant="zenkoo"
         >
@@ -183,14 +186,14 @@ export default function DashboardPage() {
               href="/saving-goals"
               variant="light"
               color="zenkoo"
-              leftSection={<IconPigMoney size={16} />}
-              rightSection={<IconArrowRight size={16} />}
+              leftSection={<PiggyBank size={16} />}
+              rightSection={<MoveRight size={16} />}
             >
               Ver todas las metas
             </Button>
 
             <Button
-              leftSection={<IconPlus size={16} />}
+              leftSection={<Plus size={16} />}
               onClick={handleNewGoal}
               color="zenkoo"
             >

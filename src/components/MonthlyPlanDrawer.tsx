@@ -13,6 +13,7 @@ import api from '@/lib/axios';
 import { showNotification } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
+import { Save } from 'lucide-react';
 
 type Props = {
   opened: boolean;
@@ -217,6 +218,7 @@ export default function MonthlyPlanDrawer({ opened, onClose, onSuccess, monthlyP
           loading={loading}
           disabled={!hasChanges}
           color="zenkoo"
+          leftSection={<Save size={16} />} 
         >
           Guardar
         </Button>

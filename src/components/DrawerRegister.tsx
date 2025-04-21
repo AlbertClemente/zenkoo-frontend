@@ -1,12 +1,13 @@
 'use client';
 
-import { Drawer, TextInput, PasswordInput, Button, Stack, Title, Group, } from '@mantine/core';
+import { Drawer, TextInput, PasswordInput, Button, Stack, Text, Group, Progress } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useState } from 'react';
 import api from '@/lib/axios';
+import { Save } from 'lucide-react';
 
 interface DrawerRegisterProps {
   opened: boolean;
@@ -15,8 +16,34 @@ interface DrawerRegisterProps {
 
 export default function DrawerRegister({ opened, onClose }: DrawerRegisterProps) {
   const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordLabel, setPasswordLabel] = useState('');
 
-  const form = useForm({
+  function getPasswordStrength(password: string) {
+    let score = 0;
+
+    if (password.length > 5) score += 1;
+    if (password.length > 8) score += 1;
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+    const labels = ['Muy débil', 'Débil', 'Aceptable', 'Fuerte', 'Muy fuerte', 'Excelente'];
+
+    return {
+      score,
+      label: labels[score],
+    };
+  }
+
+  const form = useForm<{
+    first_name: string;
+    last_name: string;
+    email: string;
+    date_of_birth: Date | null;
+    password: string;
+    confirm_password: string;
+  }>({
     initialValues: {
       first_name: '',
       last_name: '',
@@ -25,8 +52,33 @@ export default function DrawerRegister({ opened, onClose }: DrawerRegisterProps)
       password: '',
       confirm_password: '',
     },
+    validateInputOnChange: true,
     validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Email no válido'),
+      first_name: (value) =>
+        value.trim().length < 2 ? 'Nombre muy corto' : null,
+      last_name: (value) =>
+        value.trim().length < 2 ? 'Apellidos muy cortos' : null,
+      email: (value) =>
+        /^\S+@\S+\.\S+$/.test(value) ? null : 'Email no válido',
+      date_of_birth: (value) => {
+        if (!value) return 'La fecha es obligatoria';
+        const now = new Date();
+        const dob = new Date(value);
+        const age = now.getFullYear() - dob.getFullYear();
+        const m = now.getMonth() - dob.getMonth();
+        const d = now.getDate() - dob.getDate();
+        const is18 = age > 18 || (age === 18 && (m > 0 || (m === 0 && d >= 0)));
+        if (dob > now) return 'No puedes venir del futuro 🤖';
+        if (!is18) return 'Debes tener al menos 18 años';
+        return null;
+      },
+      password: (value) => {
+        if (value.length < 8) return 'Debe tener al menos 8 caracteres';
+        if (!/[A-Z]/.test(value)) return 'Debe incluir al menos una mayúscula';
+        if (!/[0-9]/.test(value)) return 'Debe incluir al menos un número';
+        if (!/[^A-Za-z0-9]/.test(value)) return 'Debe incluir un símbolo';
+        return null;
+      },
       confirm_password: (value, values) =>
         value !== values.password ? 'Las contraseñas no coinciden' : null,
     },
@@ -47,6 +99,9 @@ export default function DrawerRegister({ opened, onClose }: DrawerRegisterProps)
       });
       onClose();
     } catch (error: any) {
+      if (error.response?.data?.email) {
+        form.setFieldError('email', 'Ya existe una cuenta con ese correo');
+      }
       showNotification({
         title: 'Error',
         message: error.response?.data?.detail || 'Error al registrar',
@@ -97,16 +152,35 @@ export default function DrawerRegister({ opened, onClose }: DrawerRegisterProps)
             label="Contraseña"
             placeholder="••••••••"
             {...form.getInputProps('password')}
+            onChange={(event) => {
+              form.setFieldValue('password', event.currentTarget.value);
+              const { score, label } = getPasswordStrength(event.currentTarget.value);
+              setPasswordStrength(score);
+              setPasswordLabel(label);
+            }}
             required
           />
+          <Progress
+            value={(passwordStrength / 5) * 100}
+            color={
+              passwordStrength < 2
+                ? 'zenkooRed'
+                : passwordStrength < 4
+                ? 'zenkooYellow'
+                : 'zenkoo'
+            }
+          />
+          <Text size="xs" c="dimmed" mt={4}>
+            Fortaleza: {passwordLabel}
+          </Text>
           <PasswordInput
             label="Confirmar contraseña"
             placeholder="••••••••"
             {...form.getInputProps('confirm_password')}
             required
           />
-          <Group position="right" mt="md">
-            <Button type="submit" loading={loading}>
+          <Group justify="flex-end" mt="md">
+            <Button leftSection={<Save size={16} />} type="submit" loading={loading}>
               Registrarse
             </Button>
           </Group>

@@ -1,8 +1,9 @@
 'use client';
 
 import { Card, Text, Progress, Group, Badge, Menu, ActionIcon, Button } from '@mantine/core';
-import { IconCalendar, IconDots, IconPencil, IconTrash, IconCheck } from '@tabler/icons-react';
+import { IconDots, IconCheck } from '@tabler/icons-react';
 import { SavingGoal } from '@/lib/savinggoals';
+import { Calendar, Pencil, Trash } from 'lucide-react';
 
 interface SavingGoalCardProps {
   goal: SavingGoal;
@@ -57,12 +58,12 @@ export function SavingGoalCard({ goal, onEdit, onDelete, onMarkCompleted }: Savi
             <Menu.Dropdown>
               {/* Solo habilitar la opción de editar si no está completada */}
               {!isCompleted && onEdit && (
-                <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => onEdit(goal)}>
+                <Menu.Item leftSection={<Pencil size={16} />} onClick={() => onEdit(goal)}>
                   Editar
                 </Menu.Item>
               )}
               {onDelete && (
-                <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={() => onDelete(goal.id)}>
+                <Menu.Item leftSection={<Trash size={16} />} color="red" onClick={() => onDelete(goal.id)}>
                   Eliminar
                 </Menu.Item>
               )}
@@ -79,7 +80,7 @@ export function SavingGoalCard({ goal, onEdit, onDelete, onMarkCompleted }: Savi
 
       {goal.deadline && (
         <Group gap={4} mt="xs">
-          <IconCalendar size={16} />
+          <Calendar size={16} />
           <Text size="xs" c="dimmed">
             Hasta el {new Date(goal.deadline).toLocaleDateString()}
           </Text>

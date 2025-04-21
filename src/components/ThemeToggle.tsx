@@ -1,9 +1,9 @@
 'use client';
 
 import { ActionIcon, Tooltip, rem } from '@mantine/core';
-import { IconSun, IconMoonStars } from '@tabler/icons-react';
 import { useTheme } from './ThemeProvider';
 import { useEffect, useState } from 'react';
+import { Moon, Sun } from 'lucide-react';
 
 export default function ThemeToggle() {
   const { colorScheme, toggleColorScheme } = useTheme();
@@ -31,7 +31,7 @@ export default function ThemeToggle() {
         size="lg"
         radius="xl"
         variant="default"
-        aria-label="Toggle theme"
+        aria-label="Cambiar tema claro/oscuro"
         className={animating ? 'theme-toggle-animating' : ''}
         style={{
           transition: 'transform 0.3s ease',
@@ -39,7 +39,7 @@ export default function ThemeToggle() {
       >
         <span style={{ display: 'grid', placeItems: 'center' }}>
           {isDark ? (
-            <IconMoonStars
+            <Sun
               style={{
                 width: rem(20),
                 height: rem(20),
@@ -47,7 +47,7 @@ export default function ThemeToggle() {
               }}
             />
           ) : (
-            <IconSun
+            <Moon
               style={{
                 width: rem(20),
                 height: rem(20),

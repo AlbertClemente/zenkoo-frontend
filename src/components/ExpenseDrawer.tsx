@@ -1,6 +1,6 @@
 'use client';
 
-import { Drawer, TextInput, Button, Stack, NumberInput, Group, Badge, Text, Select } from '@mantine/core';
+import { Drawer, TextInput, Button, Stack, NumberInput, Group, Badge, Text, Select, Alert } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
@@ -14,6 +14,7 @@ import type { Expense } from '@/lib/expenses';
 import type { Category } from '@/lib/categories';
 
 import { usePredictCategory } from '@/hooks/usePredictCategory';
+import { Lightbulb, LightbulbIcon, Save } from 'lucide-react';
 
 
 interface ExpenseDrawerProps {
@@ -135,6 +136,8 @@ export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdi
     }
   }, [opened]);
 
+  const icon = <LightbulbIcon />;
+
   return (
     <Drawer
       opened={opened}
@@ -178,30 +181,31 @@ export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdi
             }}
             required
           />
-        {suggestedCategory && (
-          <Group gap="xs" mt="xs">
-            <Text size="sm">💡 Sugerencia:</Text>
-            <Badge
-              variant="light"
-              color="zenkoo"
-              style={{ cursor: 'pointer' }}
-              onClick={() => form.setFieldValue('category', suggestedCategory)}
-            >
-              {suggestedCategory}
-            </Badge>
-          </Group>
-        )}
+          {suggestedCategory && (
+            <Alert variant="light" color="zenkooYellow" title="Categoría sugerida" icon={icon}>
+              <Text mb="md">Hemos detectado que esta categoría podría encajar con tu gasto. Puedes seleccionarla a continuación o elegir la que prefieras.</Text>
+              <Badge
+                variant="light"
+                color="zenkoo"
+                style={{ cursor: 'pointer' }}
+                onClick={() => form.setFieldValue('category', suggestedCategory)}
+              >
+                {suggestedCategory}
+              </Badge>
+            </Alert>
+          )}
           <Select
             label="Categoría"
             placeholder="Selecciona o escribe"
             searchable
             data={categories}
             {...form.getInputProps('category')}
-            
           />
-          <Button type="submit" loading={loading} fullWidth>
-            Guardar gasto
-          </Button>
+          <Group justify="flex-end" mt="md">
+            <Button leftSection={<Save size={16} />}  type="submit" loading={loading} >
+              Guardar gasto
+            </Button>
+          </Group>
         </Stack>
       </form>
     </Drawer>

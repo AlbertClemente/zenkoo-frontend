@@ -2,12 +2,12 @@
 
 import { Badge, Box, Card, Group, Stack, Text, Title, rem, Tooltip, Pagination, Center,} from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
-import { IconArrowDown, IconArrowUp, IconTarget } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import { useMemo, useState } from 'react';
 import { Transaction } from '@/types/transactions';
 import CalendarCaption from './CalendarCaption';
+import { ArrowDownRight, ArrowUpRight, Target } from 'lucide-react';
 
 dayjs.locale('es');
 
@@ -229,11 +229,11 @@ export default function UserCalendarSection({ data }: { data: Transaction[] }) {
                     styles={t.isSavingGoalDay ? { root: { color: 'black' } } : {}}
                     leftSection={
                       t.kind === 'income' ? (
-                        <IconArrowUp size={12} />
+                        <ArrowUpRight size={12} />
                       ) : t.kind === 'expense' ? (
-                        <IconArrowDown size={12} />
+                        <ArrowDownRight size={12} />
                       ) : t.kind === 'goal' ? (
-                        <IconTarget size={12} />
+                        <Target size={12} />
                       ) : null
                     }
                   >

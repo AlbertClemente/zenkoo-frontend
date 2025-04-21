@@ -8,7 +8,7 @@ export default function CalendarCaption() {
   return (
     <Popover width={200} position="bottom-start" withArrow shadow="md" opened={opened}>
       <Popover.Target>
-        <ActionIcon onMouseEnter={open} onMouseLeave={close} variant="light" aria-label="Calendar Caption">
+        <ActionIcon onMouseEnter={open} onMouseLeave={close} variant="light" aria-label="Leyenda de puntos del calendario">
           <IconInfoSquareRounded style={{ width: '70%', height: '70%' }} stroke={1.5} />
         </ActionIcon>
       </Popover.Target>

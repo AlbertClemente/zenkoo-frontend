@@ -5,9 +5,10 @@ import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useState, useEffect } from 'react';
 import { showNotification } from '@mantine/notifications';
-import { IconCheck, IconX, IconPlus, IconFile, IconDeviceFloppy } from '@tabler/icons-react';
+import { IconCheck, IconX } from '@tabler/icons-react';
 import { createSavingGoal, updateSavingGoal } from '@/lib/savinggoals';
 import type { SavingGoal } from '@/lib/savinggoals';
+import { Save } from 'lucide-react';
 
 interface SavingGoalDrawerProps {
   opened: boolean;
@@ -156,7 +157,7 @@ export default function SavingGoalDrawer({ opened, onClose, onSuccess, savingGoa
           />
 
           <Group justify="flex-end" mt="md">
-            <Button type="submit" loading={loading} leftSection={<IconDeviceFloppy size={16} />}>
+            <Button type="submit" loading={loading} leftSection={<Save size={16} />}>
               Guardar meta
             </Button>
           </Group>

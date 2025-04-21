@@ -6,9 +6,10 @@ import { showNotification } from '@mantine/notifications';
 import { getExpenses, Expense, deleteExpense } from '@/lib/expenses';
 import dayjs from 'dayjs';
 import ExpenseDrawer from '@/components/ExpenseDrawer';
-import { IconPencil, IconTrash, IconCheck, IconX, IconPlus } from '@tabler/icons-react';
+import { IconCheck, IconX } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
 import { DatePickerInput } from '@mantine/dates';
+import { Pencil, Plus, Trash } from 'lucide-react';
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -100,7 +101,7 @@ export default function ExpensesPage() {
             setExpenseToEdit(null);
             setDrawerOpened(true);
           }}
-          leftSection={<IconPlus size={16} />}
+          leftSection={<Plus size={16} />}
         >
           Nuevo gasto
         </Button>
@@ -179,13 +180,13 @@ export default function ExpensesPage() {
                     <Table.Td>
                       <Group gap={4}>
                         <Tooltip label="Editar">
-                          <ActionIcon variant="subtle" color="zenkooBlue" onClick={() => handleEdit(expense)}>
-                            <IconPencil size={18} />
+                          <ActionIcon variant="subtle" color="zenkooBlue" onClick={() => handleEdit(expense)} aria-label="Modificar gasto">
+                            <Pencil size={18} />
                           </ActionIcon>
                         </Tooltip>
                         <Tooltip label="Eliminar">
-                          <ActionIcon variant="subtle" color="zenkooRed" onClick={() => handleDelete(expense.id)}>
-                            <IconTrash size={18} />
+                          <ActionIcon variant="subtle" color="zenkooRed" onClick={() => handleDelete(expense.id)} aria-label="Eliminar gasto">
+                            <Trash size={18} />
                           </ActionIcon>
                         </Tooltip>
                       </Group>

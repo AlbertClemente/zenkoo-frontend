@@ -4,12 +4,11 @@ import { useEffect, useState } from 'react';
 import { SavingGoal, getSavingGoals, updateSavingGoal, deleteSavingGoal } from '@/lib/savinggoals';
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { IconCheck, IconX, IconPigMoney } from '@tabler/icons-react';
+import { IconCheck, IconX } from '@tabler/icons-react';
 import { SavingGoalCard } from './SavingGoalCard';
 import SavingGoalDrawer from './SavingGoalDrawer';
 import { Button, SegmentedControl, Group, Card, Pagination, Text, Stack, Select } from '@mantine/core';
-
-const PAGE_SIZE = 5;
+import { Plus } from 'lucide-react';
 
 export default function SavingGoalsList() {
   const [savingGoals, setSavingGoals] = useState<SavingGoal[]>([]);
@@ -51,7 +50,7 @@ export default function SavingGoalsList() {
         showNotification({
           title: 'Error',
           message: 'Meta no encontrada.',
-          color: 'red',
+          color: 'zenkooRed',
           icon: <IconX size={16} />,
         });
         return;
@@ -65,7 +64,7 @@ export default function SavingGoalsList() {
       showNotification({
         title: 'Meta completada',
         message: '¡Felicidades! Has alcanzado tu objetivo de ahorro.',
-        color: 'green',
+        color: 'zenkoo',
         icon: <IconCheck size={16} />,
       });
 
@@ -74,7 +73,7 @@ export default function SavingGoalsList() {
       showNotification({
         title: 'Error',
         message: 'No se pudo marcar la meta como completada.',
-        color: 'red',
+        color: 'zenkooRed',
         icon: <IconX size={16} />,
       });
     }
@@ -96,14 +95,14 @@ export default function SavingGoalsList() {
       centered: true,
       children: 'Esta acción no se puede deshacer. ¿Estás seguro?',
       labels: { confirm: 'Eliminar', cancel: 'Cancelar' },
-      confirmProps: { color: 'red' },
+      confirmProps: { color: 'zenkooRed' },
       onConfirm: async () => {
         try {
           await deleteSavingGoal(id);
           showNotification({
             title: 'Meta eliminada',
             message: 'Se eliminó correctamente',
-            color: 'green',
+            color: 'zenkoo',
             icon: <IconCheck size={16} />,
           });
           fetchGoals(); // Actualizamos la lista de metas
@@ -111,7 +110,7 @@ export default function SavingGoalsList() {
           showNotification({
             title: 'Error',
             message: 'No se pudo eliminar',
-            color: 'red',
+            color: 'zenkooRed',
             icon: <IconX size={16} />,
           });
         }
@@ -145,7 +144,7 @@ export default function SavingGoalsList() {
             data={['5', '10', '20', '50']}
             style={{ minWidth: '100px' }} // Asegura que el select no se estire demasiado
           />
-          <Button onClick={handleNew} leftSection={<IconPigMoney size={16} />}>
+          <Button onClick={handleNew} leftSection={<Plus size={16} />}>
             Nueva meta
           </Button>
         </Group>

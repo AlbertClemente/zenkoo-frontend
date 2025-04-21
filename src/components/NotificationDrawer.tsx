@@ -1,13 +1,12 @@
 'use client';
 
 import { Drawer, Group, Text, ScrollArea, Button, Stack, Card, Indicator, ActionIcon, Tooltip, Switch, Pagination, Transition } from '@mantine/core';
-import { IconChecklist, IconEraser, IconX } from '@tabler/icons-react';
+import { IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import api from '@/lib/axios'; 
 import Cookies from 'js-cookie';
-
 import type { Notification } from '@/types/notification';
-
+import { CheckCheck, Eraser } from 'lucide-react';
 
 export default function NotificationDrawer({ opened, onClose, refreshUnreadCount, onNewNotificationPush}: { opened: boolean; onClose: () => void; refreshUnreadCount: () => void; onNewNotificationPush?: (callback: (notification: Notification) => void) => void; }) {
   const [notificationData, setNotificationData] = useState<{
@@ -18,6 +17,8 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
   useEffect(() => {
     if (!onNewNotificationPush) return;
   
+    console.log('🧠 Registrando callback de notificación desde NotificationDrawer');
+  
     const handleNewNotification = (newNotification: Notification) => {
       console.log('📩 Notificación recibida desde WebSocket:', newNotification);
   
@@ -25,13 +26,8 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
         console.warn('❌ Notificación sin ID. Se ignora:', newNotification);
         return;
       }
-  
+
       setNotificationData((prev) => {
-        if (!prev) {
-          console.warn('⚠️ Estado aún no cargado. Ignorando push de notificación.');
-          return prev;
-        }
-  
         const alreadyExists = prev.results.some((n) => n.id === newNotification.id);
         if (alreadyExists) {
           console.log('🔁 Notificación ya existe. Se ignora:', newNotification.id);
@@ -49,9 +45,15 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
       });
     };
   
-    // Solo registramos el callback, sin limpiar
-    onNewNotificationPush(handleNewNotification);
-  }, [onNewNotificationPush]);
+    const unregister = onNewNotificationPush(handleNewNotification);
+  
+    return () => {
+      console.log('🧹 Limpiando callback de notificación del NotificationDrawer');
+      if (typeof unregister === 'function') {
+        unregister();
+      }
+    };
+  }, []);
 
   //Paginación
   const [totalPages, setTotalPages] = useState(1);
@@ -267,10 +269,10 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
 
       {/* Acciones */}
       <Group justify="right">
-        <Button leftSection={<IconChecklist size={14} />} mt="md" onClick={markAllAsRead} disabled={!notificationData || notificationData.results.every(notification => notification.is_read)}>
+        <Button leftSection={<CheckCheck size={16} />} mt="md" onClick={markAllAsRead} disabled={!notificationData || notificationData.results.every(notification => notification.is_read)}>
           Todas leídas
         </Button>
-        <Button leftSection={<IconEraser size={14} />} mt="md" variant="light" color="zenkooRed" onClick={deleteAll} disabled={!notificationData || notificationData.results.length === 0}>
+        <Button leftSection={<Eraser size={16} />} mt="md" variant="light" color="zenkooRed" onClick={deleteAll} disabled={!notificationData || notificationData.results.length === 0}>
           Borrar todas 
         </Button>
       </Group>

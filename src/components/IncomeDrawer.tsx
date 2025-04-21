@@ -7,6 +7,7 @@ import {
   Stack,
   NumberInput,
   Select,
+  Group,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -15,6 +16,7 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { createIncome, updateIncome } from '@/lib/incomes';
 import type { Income } from '@/lib/incomes';
+import { Save } from 'lucide-react';
 
 interface IncomeDrawerProps {
   opened: boolean;
@@ -176,9 +178,11 @@ export default function IncomeDrawer({
               required
             />
           )}
-          <Button type="submit" loading={loading} fullWidth>
-            Guardar ingreso
-          </Button>
+          <Group justify="flex-end" mt="md">
+            <Button leftSection={<Save size={16} />} type="submit" loading={loading} >
+              Guardar ingreso
+            </Button>
+          </Group>
         </Stack>
       </form>
     </Drawer>

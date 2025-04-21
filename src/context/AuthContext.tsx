@@ -11,6 +11,7 @@ import { IconCheck } from '@tabler/icons-react';
 
 interface AuthContextType {
   user: LoginUser | null;
+  setUser: (user: LoginUser) => void;
   login: (email: string, password: string) => Promise<LoginUser | string>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -64,15 +65,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
     setIsAuthenticated(false);
     setLoading(false);
-
-    Promise.resolve().then(() => router.push('/'));
-
+  
     showNotification({
       title: 'Sesión cerrada',
       message: 'Has cerrado sesión correctamente',
       color: 'zenkooBlue',
       icon: <IconCheck size={16} />,
     });
+  
+    // 🔁 Forzar recarga limpia para evitar el loop
+    window.location.href = '/';
   };
 
   useEffect(() => {
@@ -98,7 +100,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ 
-      user, 
+      user,
+      setUser, 
       login, 
       logout, 
       isAuthenticated, 
