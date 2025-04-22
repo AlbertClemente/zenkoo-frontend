@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { getSavingGoals, type SavingGoal } from '@/lib/savinggoals';
+import { showNotification } from '@mantine/notifications';
+import { IconX } from '@tabler/icons-react';
 
-export function useSavingGoals() {
+export function useSavingGoals(page = 1, pageSize = 10, status?: string) {
   const [savingGoals, setSavingGoals] = useState<SavingGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -9,7 +11,7 @@ export function useSavingGoals() {
   const fetchSavingGoals = async () => {
     try {
       setLoading(true);
-      const data = await getSavingGoals();
+      const data = await getSavingGoals(page, pageSize, status);
       setSavingGoals(data.results);
     } catch (err) {
       console.error(err);
@@ -27,7 +29,7 @@ export function useSavingGoals() {
 
   useEffect(() => {
     fetchSavingGoals();
-  }, []);
+  }, [page, pageSize, status]);
 
   return { savingGoals, loading, error, refetch: fetchSavingGoals };
 }

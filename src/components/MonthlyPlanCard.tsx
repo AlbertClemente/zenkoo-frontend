@@ -17,6 +17,8 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/axios';
 import dayjs from 'dayjs';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { showNotification } from '@mantine/notifications';
+import { IconX } from '@tabler/icons-react';
 
 type Reflection = {
   id: string;
@@ -52,7 +54,13 @@ export default function MonthlyPlanCard({ reloadKey }: Props) {
         const response = await api.get('/api/monthly-plan/current/');
         setData(response.data);
       } catch (error) {
-        console.error('Error al cargar el resumen mensual:', error);
+        console.error('Error:', error);
+        showNotification({
+          title: 'Error',
+          message: 'Error al cargar el resumen mensual',
+          color: 'zenkooRed',
+          icon: <IconX size={16} />,
+        });
       } finally {
         setLoading(false);
       }

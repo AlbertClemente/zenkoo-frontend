@@ -26,16 +26,20 @@ export interface SavingGoalCreate {
   status: string;
 }
 
-export async function getSavingGoals(page: number = 1, status?: string): Promise<SavingGoalResponse> {
+export async function getSavingGoals(
+  page: number = 1,
+  status?: string,
+  pageSize: number = 5  
+): Promise<SavingGoalResponse> {
   const response = await api.get('/api/saving-goals/', {
     params: {
       page,
+      page_size: pageSize,
       ...(status && status !== 'all' ? { status } : {}),
     },
   });
   return response.data;
 }
-
 export async function createSavingGoal(data: SavingGoalCreate): Promise<SavingGoal> {
   const response = await api.post('/api/saving-goals/', data);
   return response.data;

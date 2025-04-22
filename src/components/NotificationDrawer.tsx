@@ -131,6 +131,12 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
       refreshUnreadCount();
     } catch (error) {
       console.error("Error al marcar notificación como leída:", error);
+      showNotification({
+        title: 'Error',
+        message: 'No se ha podido marcar la notificación como leída',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     }
   };
 
@@ -185,6 +191,12 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
     } catch (error) {
       console.error("Error al eliminar la notificación:", error);
       setDeletingIds((prev) => prev.filter((d) => d !== id)); // En caso de error, limpiarlo
+      showNotification({
+        title: 'Error',
+        message: 'No se ha podido eliminar la notificación',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     }
   };
 

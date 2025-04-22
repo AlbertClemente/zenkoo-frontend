@@ -5,6 +5,8 @@ import type { Expense } from '@/lib/expenses';
 import type { Income } from '@/lib/incomes';
 import type { SavingGoal } from '@/lib/savinggoals';
 import type { Transaction } from '@/types/transactions';
+import { showNotification } from '@mantine/notifications';
+import { IconX } from '@tabler/icons-react';
 
 interface PaginatedResponse<T> {
   count: number;
@@ -59,6 +61,12 @@ export default function useCalendarTransactions() {
       setTransactions([...incomeTxs, ...expenseTxs, ...goalTxs]);
     } catch (error) {
       console.error('Error cargando transacciones del calendario', error);
+      showNotification({
+        title: 'Error',
+        message: 'Error cargando transacciones del calendario',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     } finally {
       setLoading(false);
     }

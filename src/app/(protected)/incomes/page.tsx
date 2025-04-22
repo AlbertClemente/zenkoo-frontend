@@ -55,6 +55,12 @@ export default function IncomesPage() {
       setCount(data.count);
     } catch (error) {
       console.error('Error al obtener ingresos', error);
+      showNotification({
+        title: 'Error',
+        message: 'Error al obtener ingresos',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     } finally {
       setLoading(false);
     }

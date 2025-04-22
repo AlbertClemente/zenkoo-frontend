@@ -42,7 +42,13 @@ export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdi
           value: cat.name
         })));
       } catch (error) {
-        console.error('Error al cargar categorías:', error);
+        console.error('Error', error);
+        showNotification({
+          title: 'Error',
+          message: 'Error al cargar categorías',
+          color: 'zenkooRed',
+          icon: <IconX size={16} />,
+        });
       }
     };
     fetchCategories();

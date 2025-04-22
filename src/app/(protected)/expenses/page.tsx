@@ -55,6 +55,12 @@ export default function ExpensesPage() {
       setCount(data.count);
     } catch (error) {
       console.error('Error al obtener gastos', error);
+      showNotification({
+        title: 'Error',
+        message: 'Error al obtener gastos',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     } finally {
       setLoading(false);
     }

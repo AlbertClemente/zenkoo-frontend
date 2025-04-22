@@ -26,11 +26,17 @@ export default function SavingGoalsList() {
   const fetchGoals = async () => {
     setLoading(true);
     try {
-      const data = await getSavingGoals(page, filter);
+      const data = await getSavingGoals(page, filter, pageSize);
       setSavingGoals(data.results);
       setCount(data.count);
     } catch (error) {
       console.error(error);
+      showNotification({
+        title: 'Error',
+        message: 'No se ha podido obtener las metas de ahorro',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     } finally {
       setLoading(false);
     }
@@ -41,7 +47,7 @@ export default function SavingGoalsList() {
       setLoading(true);
       try {
         // ⚠️ Seguridad: forzar página 1 si se detecta que la actual es inválida
-        const data = await getSavingGoals(page, filter);
+        const data = await getSavingGoals(page, filter, pageSize);
   
         // Si page es mayor que el total, lo corregimos
         const newTotalPages = Math.max(1, Math.ceil(data.count / pageSize));
@@ -54,6 +60,12 @@ export default function SavingGoalsList() {
         setCount(data.count);
       } catch (error) {
         console.error(error);
+        showNotification({
+          title: 'Error',
+          message: 'No se ha podido obtener las metas de ahorro',
+          color: 'zenkooRed',
+          icon: <IconX size={16} />,
+        });
       } finally {
         setLoading(false);
       }
@@ -177,7 +189,6 @@ export default function SavingGoalsList() {
               { value: '5', label: '5 por página' },
               { value: '10', label: '10 por página' },
               { value: '20', label: '20 por página' },
-              { value: '50', label: '50 por página' },
             ]}
             style={{ minWidth: '100px' }} // Asegura que el select no se estire demasiado
           />
