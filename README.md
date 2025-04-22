@@ -4,7 +4,7 @@ Zenkoo es una aplicación web para gestionar tus finanzas personales, basada en 
 
 🧠 Proyecto final del **Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (DAW)** – Ilerna.
 
-🔗 Repositorio del backend: [zenkoo-backend](https://github.com/AlbertClemente/zenkoo-backend)
+🔗 [Repositorio del backend](https://github.com/AlbertClemente/zenkoo-backend)
 
 ---
 
