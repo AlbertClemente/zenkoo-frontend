@@ -9,6 +9,7 @@ import {
   Stack,
   Loader,
   Grid,
+  Paper,
 } from '@mantine/core'
 import { showNotification } from '@mantine/notifications'
 import { useEffect, useMemo, useState } from 'react'
@@ -19,11 +20,11 @@ import api from '@/lib/axios'
 import { Download, FileDown, FileJson, RefreshCcw } from 'lucide-react'
 
 export default function AdminIA() {
-  const [modelInfo, setModelInfo] = useState<any>(null)
-  const [loading, setLoading] = useState(false)
-  const [retraining, setRetraining] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [modelInfo, setModelInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [retraining, setRetraining] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const fetchModelInfo = async () => {
     setLoading(true)
@@ -32,6 +33,12 @@ export default function AdminIA() {
       setModelInfo(res.data)
     } catch (err) {
       setError('No se pudo obtener la información del modelo.')
+      showNotification({
+        title: 'Error',
+        message: error,
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     } finally {
       setLoading(false)
     }
@@ -50,7 +57,7 @@ export default function AdminIA() {
 
       showNotification({
         title: '¡Éxito!',
-        message: 'El modelo se ha reentrenado correctamente',
+        message: 'El modelo se ha reentrenado correctamente.',
         color: 'zenkoo',
         icon: <IconCheck size={16} />,
       })
@@ -113,7 +120,7 @@ export default function AdminIA() {
     console.warn('⚠️ modelInfo cargado pero sin categoryDistribution:', modelInfo)
   }
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Card shadow="sm" padding="lg" radius="md" withBorder mt="xl">
       <Title order={3} mb="sm">Gestión de IA</Title>
 
       {loading ? (
@@ -122,8 +129,9 @@ export default function AdminIA() {
         <>
           <Grid gutter="md">
             <Grid.Col span={{ base: 12, md: 6 }}>
+              <Paper shadow="sm" p="md" radius="md" withBorder>
               <Stack gap="xs" mb={20}>
-                <Text>📅 Último entrenamiento: {new Date(modelInfo.lastTrainedAt).toLocaleString()}</Text>
+                <Text>📅 Último entrenamiento: {new Date(modelInfo.lastTrainedAt).toLocaleString()} UTC</Text>
                 <Text>📦 Muestras usadas: {modelInfo.sampleCount}</Text>
                 <Text>🏷️ Categorías: {modelInfo.categories.join(', ')}</Text>
                 <Text>
@@ -147,32 +155,35 @@ export default function AdminIA() {
                   </Button>
                 </a>
               </Group>
+              </Paper>
             </Grid.Col>
 
             <Grid.Col span={{ base: 12, md: 6 }}>
-              <Title order={4} mb="sm">Distribución de categorías</Title>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={chartData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                    label
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={CATEGORY_COLORS[entry.name] || COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              <Paper shadow="sm" p="md" radius="md" withBorder>
+                <Title order={5} mb="sm">Muestras por categoría</Title>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={chartData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={90}
+                      label
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={CATEGORY_COLORS[entry.name] || COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Paper>
             </Grid.Col>
           </Grid>
         </>

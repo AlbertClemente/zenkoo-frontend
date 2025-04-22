@@ -19,7 +19,7 @@ export default function SavingGoalsPage() {
   if (!isAuthenticated) return null;
 
   return (
-    <Container>
+    <Container size="lg" py="xl">
       <Title order={2} mb="lg">Todas tus metas</Title>
       <SavingGoalsList />
     </Container>

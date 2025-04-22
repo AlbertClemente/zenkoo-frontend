@@ -62,12 +62,12 @@ export default function MonthlyPlanCard({ reloadKey }: Props) {
   }, [reloadKey]);
 
   const getSavingsColor = () => {
-    if (!data) return 'gray';
+    if (!data) return 'dark';
   
     const reserved = Number(data.reserved_savings);
     const real = Number(data.real_savings);
   
-    if (reserved === 0) return 'gray'; // o gris si prefieres
+    if (reserved === 0) return 'dark';
     if (real >= reserved) return 'zenkoo';
     if (real >= 0) return 'zenkooYellow';
     return 'zenkooRed';
@@ -81,7 +81,7 @@ export default function MonthlyPlanCard({ reloadKey }: Props) {
     const diff = real - reserved;
   
     if (reserved === 0) {
-      return 'ℹ️ Este mes no has fijado una meta de ahorro.';
+      return '⚠️ Este mes no has fijado ninguna meta de ahorro.';
     }
   
     if (!isNaN(reserved) && real >= reserved) {

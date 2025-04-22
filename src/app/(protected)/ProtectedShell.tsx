@@ -45,7 +45,7 @@ export default function ProtectedShell({ children }: { children: React.ReactNode
         <Header />
       </AppShell.Header>
       <AppShell.Main mt="xl" pt="xl" pb={{ base: 120, sm: 100 }}>
-        <Container>{children}</Container>
+        <Container mb="xl">{children}</Container>
       </AppShell.Main>
       <AppShell.Footer>
         <Footer />

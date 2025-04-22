@@ -75,11 +75,23 @@ export const zenkooTheme = (colorScheme: 'light' | 'dark') =>
         '#080B0F', // 8
         '#04060A', // 9
       ],
+      light: [
+        '#FAFAFA', // 0
+        '#EBEBEB', // 1
+        '#D6D6D6', // 2
+        '#C2C2C2', // 3
+        '#ADADAD', // 4
+        '#999999', // 5 ← base
+        '#8F8F8F', // 6
+        '#858585', // 7
+        '#7A7A7A', // 8
+        '#707070', // 9
+      ]
     },
     primaryColor: 'zenkoo',
     primaryShade: colorScheme === 'dark' ? 6 : 5,
     fontFamily: 'Inter, sans-serif',
     defaultRadius: 'md',
-    black: '#121212',     // más suave que el negro puro
+    black: '#18191a',     // más suave que el negro puro
     white: '#fafafa',     // blanco cálido para fondo
   });

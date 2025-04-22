@@ -7,6 +7,7 @@ import api from '@/lib/axios';
 import Cookies from 'js-cookie';
 import type { Notification } from '@/types/notification';
 import { CheckCheck, Eraser } from 'lucide-react';
+import { showNotification } from '@mantine/notifications';
 
 export default function NotificationDrawer({ opened, onClose, refreshUnreadCount, onNewNotificationPush}: { opened: boolean; onClose: () => void; refreshUnreadCount: () => void; onNewNotificationPush?: (callback: (notification: Notification) => void) => void; }) {
   const [notificationData, setNotificationData] = useState<{
@@ -71,6 +72,12 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
       setCurrentPage(page);
     } catch (err) {
       console.error('Error al obtener notificaciones:', err);
+      showNotification({
+        title: 'Error',
+        message: 'Error al obtener notificaciones',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     }
   };
 
@@ -97,6 +104,12 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
       refreshUnreadCount();
     } catch (err) {
       console.error('Error al marcar las notificaciones como leídas:', err);
+      showNotification({
+        title: 'Error',
+        message: 'Error al marcar las notificaciones como leídas',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     }
   };
 
@@ -140,6 +153,12 @@ export default function NotificationDrawer({ opened, onClose, refreshUnreadCount
       refreshUnreadCount();
     } catch (err) {
       console.error("Error al eliminar todas las notificaciones:", err);
+      showNotification({
+        title: 'Error',
+        message: 'Error al eliminar todas las notificaciones',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     }
   };
   

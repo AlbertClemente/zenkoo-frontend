@@ -168,7 +168,7 @@ export default function UserCalendarSection({ data }: { data: Transaction[] }) {
     'Ocio y vicio': 'zenkooYellow',
     'Cultura': 'zenkooViolet',
     'Extras': 'zenkooBlue',
-    'Desconocido': 'gray',
+    'Desconocido': 'dark',
   };
 
   return (

@@ -14,6 +14,12 @@ export function useSavingGoals() {
     } catch (err) {
       console.error(err);
       setError('Error al cargar las metas de ahorro');
+      showNotification({
+        title: 'Error',
+        message: 'No hemos podido cargar tus metas de ahorro.',
+        color: 'zenkooRed',
+        icon: <IconX size={16} />,
+      });
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Drawer, TextInput, Button, Stack, NumberInput, Group, Badge, Text, Select, Alert } from '@mantine/core';
+import { Drawer, TextInput, Button, Stack, NumberInput, Group, Badge, Text, Select, Alert, Tooltip, ActionIcon } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
@@ -169,7 +169,7 @@ export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdi
           />
           <TextInput
             label="Tipo de gasto"
-            placeholder="Ej: Sueldo, Extra, etc."
+            placeholder="Ej: Supermercado, Concierto, Cine, etc."
             {...form.getInputProps('type')}
             onBlur={(e) => {
               const value = e.target.value.trim();
@@ -195,7 +195,28 @@ export default function ExpenseDrawer({ opened, onClose, onSuccess, expenseToEdi
             </Alert>
           )}
           <Select
-            label="Categoría"
+            label={
+              <Group gap={4}>
+                Categoría
+                <Tooltip
+                  label={
+                    <Text size="xs">
+                      <strong>Supervivencia:</strong> gastos esenciales como comida, transporte, farmacia.<br />
+                      <strong>Ocio y vicio:</strong> caprichos como bares, tabaco, ropa.<br />
+                      <strong>Cultura:</strong> libros, cine, música.<br />
+                      <strong>Extras:</strong> regalos, reparaciones, electrónica.
+                    </Text>
+                  }
+                  multiline
+                  w={260}
+                  withArrow
+                >
+                  <ActionIcon variant="light" size="xs" color="gray">
+                    ?
+                  </ActionIcon>
+                </Tooltip>
+              </Group>
+            }
             placeholder="Selecciona o escribe"
             searchable
             data={categories}

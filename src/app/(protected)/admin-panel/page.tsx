@@ -7,6 +7,7 @@ import { showNotification } from '@mantine/notifications';
 import { IconAlertCircle } from '@tabler/icons-react';
 
 import AdminIA from '@/components/AdminIA';
+import AdminStats from '@/components/AdminStats';
 
 export default function AdminPanelPage() {
   const { isAdmin, loading } = useAuth();
@@ -26,5 +27,10 @@ export default function AdminPanelPage() {
 
   if (loading || !isAdmin) return null;
 
-  return <AdminIA />;
+  return (
+    <>
+      <AdminStats />
+      <AdminIA />
+    </>
+  );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Button, Container, Group, Table, Title, Badge, ActionIcon, Tooltip, Select, Loader, Pagination } from '@mantine/core';
+import { Button, Container, Group, Table, Title, Badge, ActionIcon, Tooltip, Select, Loader, Pagination, ScrollArea } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { getExpenses, Expense, deleteExpense } from '@/lib/expenses';
 import dayjs from 'dayjs';
@@ -29,11 +29,12 @@ export default function ExpensesPage() {
     'Ocio y vicio': 'zenkooYellow',
     'Cultura': 'zenkooViolet',
     'Extras': 'zenkooBlue',
-    'Desconocido': 'gray',
+    'Desconocido': 'dark',
   };
 
   const fetchExpenses = useCallback(async () => {
     try {
+      // ⚠️ Seguridad: forzar página 1 si se detecta que la actual es inválida
       const data = await getExpenses(
         page,
         startDate ? dayjs(startDate).format('YYYY-MM-DD') : undefined,
@@ -41,6 +42,15 @@ export default function ExpensesPage() {
         pageSize,
         categoryFilter || undefined
       );
+
+      // Si page es mayor que el total, lo corregimos
+      const newTotalPages = Math.max(1, Math.ceil(data.count / pageSize));
+
+      if (page > newTotalPages) {
+        setPage(1);
+        return;
+      }
+
       setExpenses(data.results);
       setCount(data.count);
     } catch (error) {
@@ -152,57 +162,59 @@ export default function ExpensesPage() {
         <Loader color="zenkoo" />
       ) : (
         <>
-          <Table striped highlightOnHover withTableBorder>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Fecha</Table.Th>
-                <Table.Th>Tipo</Table.Th>
-                <Table.Th>Categoría</Table.Th>
-                <Table.Th>Importe</Table.Th>
-                <Table.Th>Acciones</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {expenses.map((expense) => {
-                const categoryName = expense.category ?? 'Desconocido';
-                const badgeColor = categoryColors[categoryName] || 'grape';
+          <ScrollArea>
+            <Table striped highlightOnHover withTableBorder>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Fecha</Table.Th>
+                  <Table.Th>Tipo</Table.Th>
+                  <Table.Th>Categoría</Table.Th>
+                  <Table.Th>Importe</Table.Th>
+                  <Table.Th>Acciones</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {expenses.map((expense) => {
+                  const categoryName = expense.category ?? 'Desconocido';
+                  const badgeColor = categoryColors[categoryName] || 'grape';
 
-                return (
-                  <Table.Tr key={expense.id}>
-                    <Table.Td>{dayjs(expense.date).format('DD/MM/YYYY')}</Table.Td>
-                    <Table.Td>{expense.type}</Table.Td>
-                    <Table.Td>
-                      <Badge variant="light" color={badgeColor}>
-                        {categoryName}
-                      </Badge>  
-                    </Table.Td>
-                    <Table.Td>{parseFloat(expense.amount.toString()).toFixed(2)} €</Table.Td>
-                    <Table.Td>
-                      <Group gap={4}>
-                        <Tooltip label="Editar">
-                          <ActionIcon variant="subtle" color="zenkooBlue" onClick={() => handleEdit(expense)} aria-label="Modificar gasto">
-                            <Pencil size={18} />
-                          </ActionIcon>
-                        </Tooltip>
-                        <Tooltip label="Eliminar">
-                          <ActionIcon variant="subtle" color="zenkooRed" onClick={() => handleDelete(expense.id)} aria-label="Eliminar gasto">
-                            <Trash size={18} />
-                          </ActionIcon>
-                        </Tooltip>
-                      </Group>
+                  return (
+                    <Table.Tr key={expense.id}>
+                      <Table.Td>{dayjs(expense.date).format('DD/MM/YYYY')}</Table.Td>
+                      <Table.Td>{expense.type}</Table.Td>
+                      <Table.Td>
+                        <Badge variant="light" color={badgeColor}>
+                          {categoryName}
+                        </Badge>  
+                      </Table.Td>
+                      <Table.Td>{parseFloat(expense.amount.toString()).toFixed(2)} €</Table.Td>
+                      <Table.Td>
+                        <Group gap={4}>
+                          <Tooltip label="Editar">
+                            <ActionIcon variant="subtle" color="zenkooBlue" onClick={() => handleEdit(expense)} aria-label="Modificar gasto">
+                              <Pencil size={18} />
+                            </ActionIcon>
+                          </Tooltip>
+                          <Tooltip label="Eliminar">
+                            <ActionIcon variant="subtle" color="zenkooRed" onClick={() => handleDelete(expense.id)} aria-label="Eliminar gasto">
+                              <Trash size={18} />
+                            </ActionIcon>
+                          </Tooltip>
+                        </Group>
+                      </Table.Td>
+                    </Table.Tr>
+                  );
+                })}
+                {expenses.length === 0 && !loading && (
+                  <Table.Tr>
+                    <Table.Td colSpan={5} style={{ textAlign: 'center', color: '#888' }}>
+                      No hay gastos registrados.
                     </Table.Td>
                   </Table.Tr>
-                );
-              })}
-              {expenses.length === 0 && !loading && (
-                <Table.Tr>
-                  <Table.Td colSpan={5} style={{ textAlign: 'center', color: '#888' }}>
-                    No hay gastos registrados.
-                  </Table.Td>
-                </Table.Tr>
-              )}
-            </Table.Tbody>
-          </Table>
+                )}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
           {count > pageSize && (
             <Group justify="center" mt="md">
               <Pagination

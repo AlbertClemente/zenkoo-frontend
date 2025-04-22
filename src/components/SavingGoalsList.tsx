@@ -21,26 +21,46 @@ export default function SavingGoalsList() {
   const [filter, setFilter] = useState<'all' | 'active' | 'paused' | 'completed'>('all');
 
   // Calculamos el número total de páginas usando el count y pageSize
-  const totalPages = Math.ceil(count / pageSize);
-
-  useEffect(() => {
-    fetchGoals();
-  }, [page, filter, pageSize]); // Reaccionar a cambios en los parámetros
+  const totalPages = Math.max(1, Math.ceil(count / pageSize));
 
   const fetchGoals = async () => {
     setLoading(true);
     try {
-      // Aquí, cuando `filter` es 'all', obtenemos todas las metas, no solo las activas
       const data = await getSavingGoals(page, filter);
-
       setSavingGoals(data.results);
-      setCount(data.count); // Setear el total de metas para el cálculo de paginación
+      setCount(data.count);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
   };
+  
+  useEffect(() => {
+    const loadGoals = async () => {
+      setLoading(true);
+      try {
+        // ⚠️ Seguridad: forzar página 1 si se detecta que la actual es inválida
+        const data = await getSavingGoals(page, filter);
+  
+        // Si page es mayor que el total, lo corregimos
+        const newTotalPages = Math.max(1, Math.ceil(data.count / pageSize));
+        if (page > newTotalPages) {
+          setPage(1);
+          return; // Previene cargar metas con página incorrecta
+        }
+  
+        setSavingGoals(data.results);
+        setCount(data.count);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    loadGoals();
+  }, [page, filter, pageSize]);
 
   const handleMarkCompleted = async (goalId: string) => {
     try {
@@ -99,22 +119,31 @@ export default function SavingGoalsList() {
       onConfirm: async () => {
         try {
           await deleteSavingGoal(id);
+      
+          const newCount = count - 1;
+          const newTotalPages = Math.max(1, Math.ceil(newCount / pageSize));
+          const newPage = page > newTotalPages ? newTotalPages : page;
+      
+          setPage(newPage); // Actualiza la página si es necesario
+          setCount(newCount); // También puedes mantener el count actualizado
+      
           showNotification({
             title: 'Meta eliminada',
-            message: 'Se eliminó correctamente',
+            message: 'Se eliminó correctamente la meta',
             color: 'zenkoo',
             icon: <IconCheck size={16} />,
           });
-          fetchGoals(); // Actualizamos la lista de metas
+      
+          fetchGoals(); // Vuelve a cargar las metas
         } catch (err) {
           showNotification({
             title: 'Error',
-            message: 'No se pudo eliminar',
+            message: 'No se pudo eliminar la meta',
             color: 'zenkooRed',
             icon: <IconX size={16} />,
           });
         }
-      },
+      }
     });
   };
 
@@ -122,10 +151,13 @@ export default function SavingGoalsList() {
 
   return (
     <>
-      <Group justify="space-between" mt="md" mb="lg" align="center" style={{ display: 'flex', alignItems: 'center' }}>
+      <Group justify="space-between" mt="md" mb="lg" align="center">
         <SegmentedControl
           value={filter}
-          onChange={(value) => setFilter(value as 'all' | 'active' | 'paused' | 'completed')}
+          onChange={(value) => {
+            setFilter(value as 'all' | 'active' | 'paused' | 'completed');
+            setPage(1); // forzamos a página 1 con cada filtrado
+          }}
           data={[
             { label: 'Todas', value: 'all' },
             { label: 'Activas', value: 'active' },
@@ -141,7 +173,12 @@ export default function SavingGoalsList() {
               setPageSize(Number(value));
               setPage(1);
             }}
-            data={['5', '10', '20', '50']}
+            data={[
+              { value: '5', label: '5 por página' },
+              { value: '10', label: '10 por página' },
+              { value: '20', label: '20 por página' },
+              { value: '50', label: '50 por página' },
+            ]}
             style={{ minWidth: '100px' }} // Asegura que el select no se estire demasiado
           />
           <Button onClick={handleNew} leftSection={<Plus size={16} />}>
@@ -170,12 +207,12 @@ export default function SavingGoalsList() {
             ))}
           </Stack>
 
-          {count > pageSize && (
+          {totalPages > 1 && (
             <Group justify="center" mt="md">
               <Pagination
                 value={page}
                 onChange={setPage}
-                total={totalPages} // Usamos totalPages aquí para la paginación
+                total={totalPages}
                 color="zenkoo"
               />
             </Group>

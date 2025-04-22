@@ -77,6 +77,12 @@ export default function MonthlyPlanDrawer({ opened, onClose, onSuccess, monthlyP
         }
       } catch (err) {
         console.error('Error al cargar el plan mensual', err);
+        showNotification({
+          title: 'Error',
+          message: 'Error al cargar el plan mensual',
+          color: 'zenkooRed',
+          icon: <IconX size={16} />,
+        });
       }
     };
 

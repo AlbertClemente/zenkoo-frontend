@@ -1,8 +1,18 @@
 import { Container, Text, Group, Anchor } from '@mantine/core';
+import { useMantineTheme, useMantineColorScheme } from '@mantine/core';
 
 export default function AppFooter() {
+  const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
+
+  const borderColor =
+    colorScheme === 'dark'
+      ? theme.colors.dark[4]
+      : theme.colors.light[2]; // puedes sustituir "gray" por el que uses en light
+
+
   return (
-    <footer style={{ padding: '2rem 0', borderTop: '1px solid #2e2e2e' }}>
+    <footer style={{ padding: '2rem 0', borderTop: `1px solid ${borderColor}` }}>
       <Container size="lg">
         <Group justify="space-between" align="center">
           <Text size="sm" c="dimmed">

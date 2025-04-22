@@ -3,7 +3,7 @@
 import { Card, Text, Progress, Group, Badge, Menu, ActionIcon, Button } from '@mantine/core';
 import { IconDots, IconCheck } from '@tabler/icons-react';
 import { SavingGoal } from '@/lib/savinggoals';
-import { Calendar, Pencil, Trash } from 'lucide-react';
+import { Calendar, Check, Pencil, Trash } from 'lucide-react';
 
 interface SavingGoalCardProps {
   goal: SavingGoal;
@@ -35,10 +35,11 @@ export function SavingGoalCard({ goal, onEdit, onDelete, onMarkCompleted }: Savi
 
   // Determinar si la meta está completada
   const isCompleted = goal.status === 'completed';
-  const isPaused = goal.status === 'paused';
 
   // Solo habilitar el botón si la meta está activa y el monto actual es igual o superior al objetivo
-  const canMarkCompleted = goal.status === 'active' && goal.current_amount >= goal.target_amount && !isCompleted;
+  const canMarkCompleted =
+    goal.status === 'active' &&
+    Number(goal.current_amount) >= Number(goal.target_amount);
 
   return (
     <Card withBorder radius="md" shadow="sm">
@@ -56,6 +57,12 @@ export function SavingGoalCard({ goal, onEdit, onDelete, onMarkCompleted }: Savi
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
+              {/* Mostrar botón de "Marcar como completada" solo si la meta está activa y se ha alcanzado el objetivo */}
+              {canMarkCompleted && (
+                <Menu.Item leftSection={<Check size={16} />} color="zenkoo" onClick={() => onMarkCompleted?.(goal.id)}>
+                  Completar
+                </Menu.Item>
+              )}
               {/* Solo habilitar la opción de editar si no está completada */}
               {!isCompleted && onEdit && (
                 <Menu.Item leftSection={<Pencil size={16} />} onClick={() => onEdit(goal)}>
@@ -63,7 +70,7 @@ export function SavingGoalCard({ goal, onEdit, onDelete, onMarkCompleted }: Savi
                 </Menu.Item>
               )}
               {onDelete && (
-                <Menu.Item leftSection={<Trash size={16} />} color="red" onClick={() => onDelete(goal.id)}>
+                <Menu.Item leftSection={<Trash size={16} />} color="zenkooRed" onClick={() => onDelete(goal.id)}>
                   Eliminar
                 </Menu.Item>
               )}
@@ -85,19 +92,6 @@ export function SavingGoalCard({ goal, onEdit, onDelete, onMarkCompleted }: Savi
             Hasta el {new Date(goal.deadline).toLocaleDateString()}
           </Text>
         </Group>
-      )}
-
-      {/* Mostrar botón de "Marcar como completada" solo si la meta está activa y se ha alcanzado el objetivo */}
-      {canMarkCompleted && (
-        <Button
-          mt="md"
-          onClick={() => onMarkCompleted?.(goal.id)} 
-          color="zenkoo"
-          leftSection={<IconCheck size={16} />}
-          fullWidth
-        >
-          Marcar como completada
-        </Button>
       )}
     </Card>
   );

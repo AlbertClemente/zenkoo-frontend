@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Button, Container, Group, Table, Title, Select, Pagination, Loader, ActionIcon, Tooltip, Badge } from '@mantine/core';
+import { Button, Container, Group, Table, Title, Select, Pagination, Loader, ActionIcon, Tooltip, Badge, ScrollArea } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { getIncomes, Income, deleteIncome } from '@/lib/incomes';
 import dayjs from 'dayjs';
@@ -30,17 +30,27 @@ export default function IncomesPage() {
     'Regalo': 'zenkooRed',
     'Venta': 'zenkooBlue',
     'Otros': 'zenkooViolet',
-    'Desconocido': 'gray',
+    'Desconocido': 'dark',
   };
 
   const fetchIncomes = useCallback(async () => {
     try {
+      // ⚠️ Seguridad: forzar página 1 si se detecta que la actual es inválida
       const data = await getIncomes(
         page,
         startDate ? dayjs(startDate).format('YYYY-MM-DD') : undefined,
         endDate ? dayjs(endDate).format('YYYY-MM-DD') : undefined,
         pageSize
       );
+
+      // Si page es mayor que el total, lo corregimos
+      const newTotalPages = Math.max(1, Math.ceil(data.count / pageSize));
+
+      if (page > newTotalPages) {
+        setPage(1);
+        return;
+      }
+
       setIncomes(data.results);
       setCount(data.count);
     } catch (error) {
@@ -130,55 +140,56 @@ export default function IncomesPage() {
         <Loader color="zenkoo" />
       ) : (
         <>
-          <Table striped highlightOnHover withTableBorder>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Fecha</Table.Th>
-                <Table.Th>Categoría</Table.Th>
-                <Table.Th>Importe</Table.Th>
-                <Table.Th>Acciones</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {incomes.map((income) => {
-              const typeName = income.type ?? 'Desconocido';
-              const badgeColor = typeColors[typeName] || 'grape';
-
-              return (
-                <Table.Tr key={income.id}>
-                  <Table.Td>{dayjs(income.date).format('DD/MM/YYYY')}</Table.Td>
-                  <Table.Td>
-                    <Badge variant="light" color={badgeColor}>
-                      {typeName}
-                    </Badge>
-                  </Table.Td>
-                  <Table.Td>{parseFloat(income.amount.toString()).toFixed(2)} €</Table.Td>
-                  <Table.Td>
-                    <Group gap={4}>
-                      <Tooltip label="Editar">
-                        <ActionIcon variant="subtle" color="zenkooBlue" onClick={() => handleEdit(income)} aria-label="Modificar ingreso">
-                          <Pencil size={18} />
-                        </ActionIcon>
-                      </Tooltip>
-                      <Tooltip label="Eliminar">
-                        <ActionIcon variant="subtle" color="zenkooRed" onClick={() => handleDelete(income.id)} aria-label="Eliminar ingreso" >
-                          <Trash size={18} />
-                        </ActionIcon>
-                      </Tooltip>
-                    </Group>
-                  </Table.Td>
-                </Table.Tr>
-              )})}
-              {incomes.length === 0 && (
+          <ScrollArea>
+            <Table striped highlightOnHover withTableBorder>
+              <Table.Thead>
                 <Table.Tr>
-                  <Table.Td colSpan={4} style={{ textAlign: 'center', color: '#888' }}>
-                    No hay ingresos registrados.
-                  </Table.Td>
+                  <Table.Th>Fecha</Table.Th>
+                  <Table.Th>Categoría</Table.Th>
+                  <Table.Th>Importe</Table.Th>
+                  <Table.Th>Acciones</Table.Th>
                 </Table.Tr>
-              )}
-            </Table.Tbody>
-          </Table>
+              </Table.Thead>
+              <Table.Tbody>
+                {incomes.map((income) => {
+                const typeName = income.type ?? 'Desconocido';
+                const badgeColor = typeColors[typeName] || 'grape';
 
+                return (
+                  <Table.Tr key={income.id}>
+                    <Table.Td>{dayjs(income.date).format('DD/MM/YYYY')}</Table.Td>
+                    <Table.Td>
+                      <Badge variant="light" color={badgeColor}>
+                        {typeName}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td>{parseFloat(income.amount.toString()).toFixed(2)} €</Table.Td>
+                    <Table.Td>
+                      <Group gap={4}>
+                        <Tooltip label="Editar">
+                          <ActionIcon variant="subtle" color="zenkooBlue" onClick={() => handleEdit(income)} aria-label="Modificar ingreso">
+                            <Pencil size={18} />
+                          </ActionIcon>
+                        </Tooltip>
+                        <Tooltip label="Eliminar">
+                          <ActionIcon variant="subtle" color="zenkooRed" onClick={() => handleDelete(income.id)} aria-label="Eliminar ingreso" >
+                            <Trash size={18} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                )})}
+                {incomes.length === 0 && (
+                  <Table.Tr>
+                    <Table.Td colSpan={4} style={{ textAlign: 'center', color: '#888' }}>
+                      No hay ingresos registrados.
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
           {count > pageSize && (
             <Group justify="center" mt="md">
               <Pagination
@@ -188,7 +199,7 @@ export default function IncomesPage() {
                 color="zenkoo"
               />
             </Group>
-          )}
+            )}
         </>
       )}
 
