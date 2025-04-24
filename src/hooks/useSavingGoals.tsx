@@ -11,7 +11,7 @@ export function useSavingGoals(page = 1, pageSize = 10, status?: string) {
   const fetchSavingGoals = async () => {
     try {
       setLoading(true);
-      const data = await getSavingGoals(page, pageSize, status);
+      const data = await getSavingGoals(page, status, pageSize);
       setSavingGoals(data.results);
     } catch (err) {
       console.error(err);
